@@ -165,7 +165,9 @@ int MainWindow::circleCounter(const cv::Mat &img, const int &ncircle) {
     std::vector<cv::Vec3f> circles;
 
     /// Apply the Hough Transform to find the circles
-    cv::HoughCircles( gray, circles, CV_HOUGH_GRADIENT, 1, 90, 255, ncircle, 100, 0 ); //20
+	//DLP 20230310 updated to reflect current constant name
+    //cv::HoughCircles( gray, circles, CV_HOUGH_GRADIENT, 1, 90, 255, ncircle, 100, 0 ); //20
+    cv::HoughCircles( gray, circles, cv::HOUGH_GRADIENT, 1, 90, 255, ncircle, 100, 0 ); //20
 
     return circles.size();
 
@@ -177,7 +179,9 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
     rgb.copyTo(temp, binMask);
 
     cv::Mat gg;
-    cv::cvtColor(temp, gg, CV_BGR2GRAY);
+	//DLP 20230310 updated to reflect current constant name
+    //cv::cvtColor(temp, gg, CV_BGR2GRAY);
+    cv::cvtColor(temp, gg, cv::COLOR_BGR2GRAY);
 
     cv::Vec3b prevColor(0,0,0);
     int countColor = 0;
@@ -244,9 +248,13 @@ void MainWindow::findCircle(cv::Mat &src_gray, std::vector<cv::Point2f> &center,
     std::vector<cv::Vec4i> hierarchy;
 
     /// Detect edges using Threshold
-    cv::threshold( src_gray, threshold_output, 120, 255, CV_THRESH_BINARY );
+	//DLP 20230310 updated to reflect current constant name
+    //cv::threshold( src_gray, threshold_output, 120, 255, CV_THRESH_BINARY );
+    cv::threshold( src_gray, threshold_output, 120, 255, cv::THRESH_BINARY );
     /// Find contours
-    cv::findContours( threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0) );
+	//DLP 20230310 updated to reflect current constant name
+    //cv::findContours( threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0) );
+    cv::findContours( threshold_output, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0) );
 
     /// Approximate contours to polygons + get bounding rects and circles
     std::vector<std::vector<cv::Point> > contours_poly( contours.size() );
@@ -516,8 +524,9 @@ void MainWindow::process() {
     //EQ
     std::vector<cv::Mat> channels;
     cv::Mat img_hist_equalized;
-
-    cv::cvtColor(rgb, img_hist_equalized, CV_BGR2YCrCb); //change the color image from BGR to YCrCb format
+	//DLP 20230310 updated to reflect current constant name
+    //cv::cvtColor(rgb, img_hist_equalized, CV_BGR2YCrCb); //change the color image from BGR to YCrCb format
+    cv::cvtColor(rgb, img_hist_equalized, cv::COLOR_BGR2YCrCb); //change the color image from BGR to YCrCb format
 
     cv::split(img_hist_equalized,channels); //split the image into channels
 
@@ -525,7 +534,9 @@ void MainWindow::process() {
 
     cv::merge(channels,img_hist_equalized); //merge 3 channels including the modified 1st channel into one image
 
-    cv::cvtColor(img_hist_equalized, img_hist_equalized, CV_YCrCb2BGR);
+	//DLP 20230310 updated to reflect current constant name
+    //cv::cvtColor(img_hist_equalized, img_hist_equalized, CV_YCrCb2BGR);
+    cv::cvtColor(img_hist_equalized, img_hist_equalized, cv::COLOR_YCrCb2BGR);
 
     cv::Mat rgb_new;
     rgb_new = img_hist_equalized.clone();
@@ -544,7 +555,9 @@ void MainWindow::process() {
 
     //Edge Detection
     cv::Mat grayImg;
-    cv::cvtColor(rgb_new.clone(), grayImg, CV_BGR2GRAY);
+	//DLP 20230310 updated to reflect current constant name
+    //cv::cvtColor(rgb_new.clone(), grayImg, CV_BGR2GRAY);
+    cv::cvtColor(rgb_new.clone(), grayImg, cv::COLOR_BGR2GRAY);
     cv::Mat edge;
 
     double thresh = ui->threshSpinBox->value();
@@ -614,7 +627,9 @@ void MainWindow::process() {
         tempCont = cv::Scalar(0);
         cv::approxPolyDP(cv::Mat(contours[contourIdx]), contours_poly[contourIdx], 3, true);
         boundRect[contourIdx] = cv::boundingRect(cv::Mat(contours_poly[contourIdx]));
-        cv::drawContours( tempCont, contours, contourIdx, cv::Scalar(255), CV_FILLED );
+        //DLP 20230310 updated to reflect current constant name
+		//cv::drawContours( tempCont, contours, contourIdx, cv::Scalar(255), CV_FILLED );
+		cv::drawContours( tempCont, contours, contourIdx, cv::Scalar(255), cv::FILLED );
 
         int pixelCount = 0;
         int thresh_color = 190;
@@ -642,7 +657,9 @@ void MainWindow::process() {
 
     rgbLabels.copyTo(tempRgbLabels, newMask);
 
-    cv::cvtColor(tempRgbLabels, tempRgbLabelsBw, CV_RGB2GRAY);
+	//DLP 20230310 updated to reflect current constant name
+    //cv::cvtColor(tempRgbLabels, tempRgbLabelsBw, CV_RGB2GRAY);
+    cv::cvtColor(tempRgbLabels, tempRgbLabelsBw, cv::COLOR_RGB2GRAY);
 
     EdgeDetector new_edges(tempRgbLabelsBw, new_edge, thresh, sigma);
 
@@ -668,12 +685,16 @@ void MainWindow::process() {
         double area = moms.m00;
 
         bin_edges = cv::Scalar(0);
-        cv::drawContours( bin_edges, filteredContours, contourIdx, cv::Scalar(255), CV_FILLED );
+		//DLP 20230310 updated to reflect current constant name
+        //cv::drawContours( bin_edges, filteredContours, contourIdx, cv::Scalar(255), CV_FILLED );
+        cv::drawContours( bin_edges, filteredContours, contourIdx, cv::Scalar(255), cv::FILLED );
 
         if(area > bestArea && area < maxArea && area > minArea && std::abs(bbox.width - bbox.height) < 350)
         {
             bin_edges = cv::Scalar(0);
-            cv::drawContours( bin_edges, filteredContours, contourIdx, cv::Scalar(255), CV_FILLED );
+			//DLP 20230310 updated to reflect current constant name
+            //cv::drawContours( bin_edges, filteredContours, contourIdx, cv::Scalar(255), CV_FILLED );
+            cv::drawContours( bin_edges, filteredContours, contourIdx, cv::Scalar(255), cv::FILLED );
 
             int nTempCircles = circleCounter(bin_edges, 8);
             int colorCounter = imageColorCounting(bbox, bin_edges, rgbLabels);
@@ -687,8 +708,9 @@ void MainWindow::process() {
     }
 
     bin_edges = cv::Scalar(0);
-
-    cv::drawContours( bin_edges, filteredContours, idx, cv::Scalar(255), CV_FILLED );
+	//DLP 20230310 updated to reflect current constant name
+    //cv::drawContours( bin_edges, filteredContours, idx, cv::Scalar(255), CV_FILLED );
+	cv::drawContours( bin_edges, filteredContours, idx, cv::Scalar(255), cv::FILLED );
 
     int segCircleNumber = circleCounter(bin_edges, 8);
 
@@ -786,7 +808,9 @@ void MainWindow::compute_segmentation_manually() {
 
         std::cout << dir << std::endl;
 #ifdef GT
-        gt = cv::imread(gt_name.c_str(), CV_LOAD_IMAGE_UNCHANGED);
+		//DLP 20230310 updated to reflect current constant name
+        //gt = cv::imread(gt_name.c_str(), CV_LOAD_IMAGE_UNCHANGED);
+        gt = cv::imread(gt_name.c_str(), cv::IMREAD_UNCHANGED);
 #endif
 
         cv::Mat dst = cv::Mat::zeros(cv::Size(ui->rgb_label->width(),
@@ -831,7 +855,9 @@ void MainWindow::compute_segmentation_automaticcaly() {
                 rgb.copyTo(rgb, newMask);
             }
 
-            gt = cv::imread(gt_name.c_str(), CV_LOAD_IMAGE_UNCHANGED);
+			//DLP 20230310 updated to reflect current constant name
+            //gt = cv::imread(gt_name.c_str(), CV_LOAD_IMAGE_UNCHANGED);
+			gt = cv::imread(gt_name.c_str(), cv::IMREAD_UNCHANGED);
 
             cv::Mat dst = cv::Mat::zeros(cv::Size(ui->rgb_label->width(),
                                                   ui->rgb_label->height()), rgb.type());
@@ -1089,8 +1115,9 @@ void MainWindow::load_mask() {
 
         dirName = file.substr(0, index);
         isPossibleToExecute = true;
-
-        mask = cv::imread(file.c_str(), CV_LOAD_IMAGE_ANYDEPTH);
+		//DLP 20230310 updated to reflect current constant name
+		//mask = cv::imread(file.c_str(), CV_LOAD_IMAGE_ANYDEPTH);
+        mask = cv::imread(file.c_str(), cv::IMREAD_ANYDEPTH);
 
         cv::imshow("mask", mask);
 

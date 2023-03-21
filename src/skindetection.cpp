@@ -48,8 +48,9 @@ void SkinDetection::compute() {
 
     std::vector<cv::Mat> channels;
     cv::Mat img_hist_equalized;
-
-    cv::cvtColor(img, img_hist_equalized, CV_BGR2YCrCb); //change the color image from BGR to YCrCb format
+	//DLP 20230310 updated to use current constant naming convention
+    //cv::cvtColor(img, img_hist_equalized, CV_BGR2YCrCb); //change the color image from BGR to YCrCb format
+    cv::cvtColor(img, img_hist_equalized, cv::COLOR_BGR2YCrCb); //change the color image from BGR to YCrCb format
 
     cv::split(img_hist_equalized,channels); //split the image into channels
 
@@ -57,7 +58,9 @@ void SkinDetection::compute() {
 
     cv::merge(channels,img_hist_equalized); //merge 3 channels including the modified 1st channel into one image
 
-    cv::cvtColor(img_hist_equalized, img_hist_equalized, CV_YCrCb2BGR);
+	//DLP 20230310 updated to use current constant naming convention
+    //cv::cvtColor(img_hist_equalized, img_hist_equalized, CV_YCrCb2BGR);
+    cv::cvtColor(img_hist_equalized, img_hist_equalized, cv::COLOR_YCrCb2BGR);
 
     img = img_hist_equalized.clone();
 
@@ -65,6 +68,8 @@ void SkinDetection::compute() {
     cv::Mat sel = cv::getStructuringElement(cv::MORPH_RECT , cv::Size(11,11));
     cv::morphologyEx(img, img, cv::MORPH_CLOSE,  sel);
 
+	//DLP 20230310 updated to use current constant naming convention
+    //cv::cvtColor(img, ycrcb, CV_BGR2YCrCb);
     cv::cvtColor(img, ycrcb, cv::COLOR_BGR2YCrCb);
     cv::inRange(ycrcb,cv::Scalar(Y_MIN,Cr_MIN,Cb_MIN),cv::Scalar(Y_MAX,Cr_MAX,Cb_MAX),bw);
 
@@ -77,7 +82,9 @@ void SkinDetection::compute() {
         }
     }
 
-    cv::cvtColor(img_skin, hsv, CV_BGR2HSV);
+	//DLP 20230310 updated to use current constant naming convention
+    //cv::cvtColor(img_skin, hsv, CV_BGR2HSV);
+    cv::cvtColor(img_skin, hsv, cv::COLOR_BGR2HSV);
 
     for(int i = 0; i < img.rows; i++) {
         for(int j = 0; j< img.cols; j++) {
@@ -122,8 +129,9 @@ void SkinDetection::compute() {
             idx = contourIdx;
         }
     }
-
-    cv::drawContours( bw, contours, idx, cv::Scalar(255), CV_FILLED );
+	//DLP 20230310 updated to use current constant naming convention
+    //cv::drawContours( bw, contours, idx, cv::Scalar(255), CV_FILLED );
+    cv::drawContours( bw, contours, idx, cv::Scalar(255), cv::FILLED );
 
     img.copyTo(neo, bw);
 

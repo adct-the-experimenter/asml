@@ -73,7 +73,9 @@ RgbSegmentation::RgbSegmentation(const cv::Mat &img, const cv::Mat &rgbImg,
     cv::Mat hsv;
 
     //aggiungere RGB non img
-    cv::cvtColor(rgbImg, hsv, CV_RGB2HSV);
+	//DLP 20230310 updated to use current constant naming convention
+    //cv::cvtColor(rgbImg, hsv, CV_RGB2HSV);
+	cv::cvtColor(rgbImg, hsv, cv::COLOR_RGB2HSV);
 
     std::vector<cv::Mat> bgr_planes;
     cv::split( hsv, bgr_planes );
@@ -171,9 +173,8 @@ cv::Mat RgbSegmentation::colorImageSegments(const cv::Mat &bgr, const std::vecto
     }
 
     cv::Mat erodeLabels, dilateLabels;
-
     cv::Mat kernel = cv::Mat::ones(cv::Size(3, 3), CV_64F);
-
+    
     cv::Mat labelsCopy = cv::Mat(cv::Size(cols, rows), CV_64FC1);
 
     for(i = 0; i < rows; ++i)
@@ -207,7 +208,6 @@ cv::Mat RgbSegmentation::colorImageSegments(const cv::Mat &bgr, const std::vecto
                                                                 (double) size));
         }
     }
-
 
 
     cv::Mat bgrNew = cv::Mat::zeros(bgr.size(), CV_8UC3);
@@ -385,7 +385,7 @@ std::vector<int> RgbSegmentation::integrate_merges(const std::vector<int>& old_l
 cv::Mat RgbSegmentation::mat2cvMat(const std::vector<double>& rgb) {
     int i, j;
     int doublePixelNumber = pixelNumber*2;
-    cv::Mat img = cv::Mat(cv::Size(rows, cols), CV_8UC3);
+	cv::Mat img = cv::Mat(cv::Size(rows, cols), CV_8UC3);
 
     for(i = 0; i < rows; ++i)
     {
