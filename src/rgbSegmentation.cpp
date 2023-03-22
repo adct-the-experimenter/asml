@@ -259,11 +259,21 @@ std::vector<double> RgbSegmentation::accumarray(const std::vector<int>& subs, co
     std::vector<double> out(labelSize);
 
     AccumElem elements[labelSize];
-
-    for(i = 0; i < pixelNumber - 1; ++i)
+	
+	printf("subs size: %d\n",subs.size());
+	printf("vals size: %d\n",vals.size());
+	printf("pixelNumber: %d\n",pixelNumber);
+	printf("labelSize: %d\n",labelSize);
+	
+    for(i = 0; i < pixelNumber; ++i)
     {
         elements[subs[i] - 1].index++;
-        elements[subs[i+1] - 1].sum += vals[i];
+        
+        if(subs[i+1] - 1 < labelSize)
+        {
+			elements[subs[i+1] - 1].sum += vals[i];
+		}
+        
     }
 
     for(i = 0; i < labelSize; ++i)
