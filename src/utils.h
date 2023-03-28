@@ -19,8 +19,8 @@
 #include <opencv2/opencv.hpp>
 
 template<typename T>
-cv::Mat vector2mat(const cv::Mat &_mat, const int &_rows, const int &_cols)
-{
+cv::Mat vector2mat(const cv::Mat &_mat, const int &_rows, const int &_cols) {
+	logExecTimes.logStart("utils.h vector2mat");
     cv::Mat v = cv::Mat(cv::Size(_cols, _rows), _mat.type());
 
     int x = 0, y = 0;
@@ -37,12 +37,13 @@ cv::Mat vector2mat(const cv::Mat &_mat, const int &_rows, const int &_cols)
             }*/
         }
     }
+	logExecTimes.logStop("utils.h vector2mat");
     return v;
 }
 
 template<typename T>
-cv::Mat mat2vector(const cv::Mat &_mat)
-{
+cv::Mat mat2vector(const cv::Mat &_mat) {
+	logExecTimes.logStart("utils.h mat2vector");
     int rows = _mat.rows;
     int cols = _mat.cols;
     int i = 0;
@@ -57,12 +58,13 @@ cv::Mat mat2vector(const cv::Mat &_mat)
         }
     }
 
+	logExecTimes.logStop("utils.h mat2vector");
     return v;
 }
 
-
 template<typename T>
 T *allocateVector(const int &size, const bool &init, const T &initValue) {
+	logExecTimes.logStart("utils.h *allocateVector");
     T* vec = new T[size];
     if(vec == NULL) {
         std::cerr << "Error to allocate Vector" << std::endl;
@@ -76,12 +78,14 @@ T *allocateVector(const int &size, const bool &init, const T &initValue) {
        }
     }
 
+	logExecTimes.logStop("utils.h *allocateVector");
     return vec;
 }
 
 template<typename T>
 T *allocateMatrix(const int &rows, const int &cols,
                    const bool &init, const double &initValue) {
+	logExecTimes.logStart("utils.h *allocateMatrix");
     int i;
     T *matrix;
     int size = rows*cols;
@@ -98,12 +102,14 @@ T *allocateMatrix(const int &rows, const int &cols,
         }
     }
 
+	logExecTimes.logStop("utils.h *allocateMatrix");
     return matrix;
 }
 
 template<typename T>
 T *copyMatrix(const T* _matrix, const int &rows,
                const int &cols) {
+	logExecTimes.logStart("utils.h *copyMatrix");
 
     T* matrix_ = allocateMatrix<T>(rows, cols, true, T(0));
     int i;
@@ -112,12 +118,14 @@ T *copyMatrix(const T* _matrix, const int &rows,
         *(matrix_ + i) = *(_matrix + i);
     }
 
+	logExecTimes.logStop("utils.h *copyMatrix");
     return matrix_;
 
 }
 
 template<typename T>
 T *copyVector(const T* _vector, const int &size) {
+	logExecTimes.logStart("utils.h *copyVector");
 
     T* vector_ = allocateVector<T>(size, true, T());
     //T* vector_ = allocateMatrix<T>(rows, cols, true, T(0));
@@ -126,6 +134,7 @@ T *copyVector(const T* _vector, const int &size) {
         *(vector_ + i) = *(_vector + i);
     }
 
+	logExecTimes.logStop("utils.h *copyVector");
     return vector_;
 
 }

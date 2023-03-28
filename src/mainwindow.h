@@ -9,6 +9,7 @@
  *  andrea.pennisi@gmail.com
  *
  */
+ 
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -23,6 +24,11 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <future>
+
+//DLP 20230310 include chrono and timinglogger for capturing timings
+#include <chrono>
+#include "timinglogger.h"
+
 #include "rgbSegmentation.h"
 #include "qtcvtransform.h"
 #include "edgedetector.h"

@@ -22,6 +22,10 @@
 #ifndef DELAUNAYTRI_H
 #define DELAUNAYTRI_H
 
+//DLP 20230310 include chrono and timinglogger for capturing timings
+#include <chrono>
+#include "timinglogger.h"
+
 #include <opencv2/opencv.hpp>
 #include <map>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>

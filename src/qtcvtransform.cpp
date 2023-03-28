@@ -12,8 +12,9 @@
 
 #include "qtcvtransform.h"
 
-QImage* Mat2QImage(const cv::Mat img)
-{
+QImage* Mat2QImage(const cv::Mat img) {
+	logExecTimes.logStart("qtcvtransform.cpp Mat2QImage");
+
     int h = img.rows;
     int w = img.cols;
     QImage *qimg;
@@ -53,14 +54,16 @@ QImage* Mat2QImage(const cv::Mat img)
         }
     }
 
+	logExecTimes.logStop("qtcvtransform.cpp Mat2QImage");
     return qimg;
 }
 
-
 cv::Mat QImage2Mat(const QImage *qimg) {
+	logExecTimes.logStart("qtcvtransform.cpp QImage2Mat");
     cv::Mat mat = cv::Mat(qimg->height(), qimg->width(), CV_8UC4, (uchar*)qimg->bits(), qimg->bytesPerLine());
     cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
     int from_to[] = { 0,0,  1,1,  2,2 };
     cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
+	logExecTimes.logStop("qtcvtransform.cpp QImage2Mat");
     return mat2;
 }

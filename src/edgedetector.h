@@ -22,6 +22,11 @@
 #ifndef EDGEDETECTOR_H
 #define EDGEDETECTOR_H
 
+//DLP 20230310 include chrono and timinglogger for capturing timings
+#include <chrono>
+#include "timinglogger.h"
+
+
 #include <vector>
 #include <queue>
 #include <iostream>

@@ -12,6 +12,10 @@
 #ifndef QTCVTRANSFORM_H
 #define QTCVTRANSFORM_H
 
+//DLP 20230310 include chrono and timinglogger for capturing timings
+#include <chrono>
+#include "timinglogger.h"
+
 #include <QApplication>
 #include <QMainWindow>
 #include "opencv2/opencv.hpp"

@@ -16,6 +16,7 @@ MergeTriangles::MergeTriangles(const std::vector<double> &neighbors,
                                const std::vector<double> &color_weigths,
                                const std::vector<double> &edge_lengths,
                                const int &ntri) {
+	logExecTimes.logStart("MergeTriangles::MergeTriangles");
     int i;
     edge *best_edge;
 
@@ -72,15 +73,18 @@ MergeTriangles::MergeTriangles(const std::vector<double> &neighbors,
     delete[] edge_buffer.buf;
     delete[] edge_heap.elts;
     delete[] adjacency_table;
+	logExecTimes.logStop("MergeTriangles::MergeTriangles");
 }
 
 void MergeTriangles::InitNodes() {
+	logExecTimes.logStart("MergeTriangles::InitNodes");
     node *node_ptr;
     int i;
 
     for (i=0, node_ptr = node_buffer.buf; i < ntri; ++i, ++node_ptr) {
         node_ptr->edge_list = NULL;
     }
+	logExecTimes.logStop("MergeTriangles::InitNodes");
 }
 
 int MergeTriangles::other_idx(edge *theEdge, const int &idx) {
@@ -88,10 +92,12 @@ int MergeTriangles::other_idx(edge *theEdge, const int &idx) {
 }
 
 void MergeTriangles::update_index (edge *theEdge, const int &old_idx, const int &new_idx) {
+	logExecTimes.logStart("MergeTriangles::update_index");
     if (theEdge->idx1 == old_idx)
         theEdge->idx1 = new_idx;
     else
         theEdge->idx2 = new_idx;
+	logExecTimes.logStop("MergeTriangles::update_index");
 }
 
 struct MergeTriangles::edge_tag *MergeTriangles::get_next_edge (edge *theEdge, const int &idx) {
@@ -102,24 +108,28 @@ struct MergeTriangles::edge_tag *MergeTriangles::get_prev_edge (edge *theEdge, c
     return (theEdge->idx1 == idx) ? theEdge->prev1 : theEdge->prev2;
 }
 
-
 void MergeTriangles::set_next_edge (edge *theEdge, const int &idx, struct edge_tag *ptr) {
+	logExecTimes.logStart("MergeTriangles::set_next_edge");
     if (theEdge->idx1 == idx) {
         theEdge->next1 = ptr;
     } else {
         theEdge->next2 = ptr;
     }
+	logExecTimes.logStop("MergeTriangles::set_next_edge");
 }
 
 void MergeTriangles::set_prev_edge (edge *theEdge, const int &idx, struct edge_tag *ptr) {
+	logExecTimes.logStart("MergeTriangles::set_prev_edge");
     if (theEdge->idx1 == idx) {
         theEdge->prev1 = ptr;
     } else {
         theEdge->prev2 = ptr;
     }
+	logExecTimes.logStop("MergeTriangles::set_prev_edge");
 }
 
 void MergeTriangles::add_to_adjacency_list(const int &node_index, edge *theEdge) {
+	logExecTimes.logStart("MergeTriangles::add_to_adjacency_list");
 
     node *theNode = node_buffer.buf + node_index;
     edge *head_elt = theNode->edge_list;
@@ -132,12 +142,18 @@ void MergeTriangles::add_to_adjacency_list(const int &node_index, edge *theEdge)
     }
 
     theNode->edge_list = theEdge;
+	logExecTimes.logStop("MergeTriangles::add_to_adjacency_list");
 }
 
 void MergeTriangles::remove_from_adjacency_list(const int &node_index, edge *theEdge) {
+	logExecTimes.logStart("MergeTriangles::remove_from_adjacency_list");
     node *theNode = node_buffer.buf + node_index;
-    edge *prev = get_prev_edge (theEdge, node_index);
-    edge *next = get_next_edge (theEdge, node_index);
+	logExecTimes.logStart("MergeTriangles::get_prev_edge");
+    edge *prev = MergeTriangles::get_prev_edge (theEdge, node_index);
+	logExecTimes.logStop("MergeTriangles::get_prev_edge");
+	logExecTimes.logStart("MergeTriangles::get_next_edge");
+	edge *next = MergeTriangles::get_next_edge (theEdge, node_index);
+	logExecTimes.logStop("MergeTriangles::get_next_edge");
 
     if (prev) {
         set_next_edge(prev, node_index, next);
@@ -148,10 +164,12 @@ void MergeTriangles::remove_from_adjacency_list(const int &node_index, edge *the
     if (next) {
         set_prev_edge (next, node_index, prev);
     }
+	logExecTimes.logStop("MergeTriangles::remove_from_adjacency_list");
 }
 
 
 void MergeTriangles::heap_swap(const int &idx1, const int &idx2) {
+	logExecTimes.logStart("MergeTriangles::heap_swap");
 
     edge* temp = edge_heap.elts[idx1];
     edge_heap.elts[idx1] = edge_heap.elts[idx2];
@@ -159,10 +177,12 @@ void MergeTriangles::heap_swap(const int &idx1, const int &idx2) {
 
     edge_heap.elts[idx1]->heap_index = idx1;
     edge_heap.elts[idx2]->heap_index = idx2;
+	logExecTimes.logStop("MergeTriangles::heap_swap");
 }
 
 
 void MergeTriangles::heapify_up(int k) {
+	logExecTimes.logStart("MergeTriangles::heapify_up");
 
     long double merge_cost = edge_heap.elts[k]->merge_cost;
     int parent;
@@ -175,9 +195,11 @@ void MergeTriangles::heapify_up(int k) {
         } else
             break;
     }
+	logExecTimes.logStop("MergeTriangles::heapify_up");
 }
 
 void MergeTriangles::heapify_down(int k) {
+	logExecTimes.logStart("MergeTriangles::heapify_down");
     long double merge_cost = edge_heap.elts[k]->merge_cost;
     int child;
 
@@ -197,16 +219,20 @@ void MergeTriangles::heapify_down(int k) {
         } else
             break;
     }
+	logExecTimes.logStop("MergeTriangles::heapify_down");
 }
 
 void MergeTriangles::add_to_edge_heap(edge *theEdge) {
+	logExecTimes.logStart("MergeTriangles::add_to_edge_heap");
     edge_heap.elts[edge_heap.count] = theEdge;
     theEdge->heap_index = edge_heap.count;
     heapify_up(edge_heap.count);
     ++edge_heap.count;
+	logExecTimes.logStop("MergeTriangles::add_to_edge_heap");
 }
 
 void MergeTriangles::remove_from_edge_heap(edge *theEdge) {
+	logExecTimes.logStart("MergeTriangles::remove_from_edge_heap");
 
     int idx = theEdge->heap_index;
     long double new_merge_cost, old_merge_cost;
@@ -222,10 +248,12 @@ void MergeTriangles::remove_from_edge_heap(edge *theEdge) {
         heapify_up(idx);
     else
         heapify_down(idx);
+	logExecTimes.logStop("MergeTriangles::remove_from_edge_heap");
 }
 
 void MergeTriangles::InitEdges(const std::vector<double> &SN, const std::vector<double> &edge_weights,
                                const std::vector<double> &edge_lengths) {
+	logExecTimes.logStart("MergeTriangles::InitEdges");
     int i, j, idx;
     edge *theEdge;
 
@@ -282,10 +310,12 @@ void MergeTriangles::InitEdges(const std::vector<double> &SN, const std::vector<
             }
         }
     }
+	logExecTimes.logStop("MergeTriangles::InitEdges");
 }
 
 
 void MergeTriangles::merge_edges (edge *edge1, edge *edge2) {
+	logExecTimes.logStart("MergeTriangles::merge_edges");
     long double merge_cost1, merge_cost2;
     long double length1, length2;
     long double new_merge_cost, new_length;
@@ -307,15 +337,20 @@ void MergeTriangles::merge_edges (edge *edge1, edge *edge2) {
         heapify_up (edge1->heap_index);
     else
         heapify_down (edge1->heap_index);
+	logExecTimes.logStop("MergeTriangles::merge_edges");
 }
 
 
 void MergeTriangles::merge_nodes(const int &idx1, const int &idx2) {
+	logExecTimes.logStart("MergeTriangles::merge_nodes");
     int head_idx;
     node *node1, *node2;
     edge *list1, *list2, *head_elt, *clear_list;
 
-    if (idx1 == idx2) return;
+    if (idx1 == idx2){
+		logExecTimes.logStop("MergeTriangles::merge_nodes");
+		return;
+	}
 
     node1 = node_buffer.buf + idx1;
     node2 = node_buffer.buf + idx2;
@@ -327,9 +362,12 @@ void MergeTriangles::merge_nodes(const int &idx1, const int &idx2) {
 
     while (list2) {
         head_elt = list2;
+		logExecTimes.logStart("MergeTriangles::get_next_edge");
         list2 = get_next_edge(list2, idx2);
-
+		logExecTimes.logStop("MergeTriangles::get_next_edge");
+		logExecTimes.logStart("MergeTriangles::other_idx");
         head_idx = other_idx(head_elt, idx2);
+		logExecTimes.logStop("MergeTriangles::other_idx");
 
         update_index (head_elt, idx2, idx1);
 
@@ -343,9 +381,12 @@ void MergeTriangles::merge_nodes(const int &idx1, const int &idx2) {
 
     while (list1) {
         head_elt = list1;
+		logExecTimes.logStart("MergeTriangles::get_next_edge");
         list1 = get_next_edge(list1, idx1); // Pop list1
-
+		logExecTimes.logStop("MergeTriangles::get_next_edge");
+		logExecTimes.logStart("MergeTriangles::other_idx");
         head_idx = other_idx(head_elt, idx1);
+		logExecTimes.logStop("MergeTriangles::other_idx");
 
         if (adjacency_table[head_idx]) {
 
@@ -362,16 +403,23 @@ void MergeTriangles::merge_nodes(const int &idx1, const int &idx2) {
     }
 
     while (clear_list) {
+		logExecTimes.logStart("MergeTriangles::other_idx");
         adjacency_table[other_idx(clear_list, idx1)] = NULL;
+		logExecTimes.logStop("MergeTriangles::other_idx");
+		logExecTimes.logStart("MergeTriangles::get_next_edge");
         clear_list = get_next_edge(clear_list, idx1);
+		logExecTimes.logStop("MergeTriangles::get_next_edge");
     }
+	logExecTimes.logStop("MergeTriangles::merge_nodes");
 }
 
 void MergeTriangles::getNewLabels(std::vector<double> &merge_cost_, std::vector<int> &old_labels_,
                                   std::vector<int> &new_labels_, std::vector<double> &merge_lengths_) {
+	logExecTimes.logStart("MergeTriangles::getNewLabels");
 
     merge_cost_ = merge_cost;
     merge_lengths_ = merge_length;
     old_labels_ = old_labels;
     new_labels_ = new_labels;
+	logExecTimes.logStop("MergeTriangles::getNewLabels");
 }
