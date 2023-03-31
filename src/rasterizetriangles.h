@@ -13,6 +13,10 @@
 #ifndef RASTERIZETRIANGLES_H
 #define RASTERIZETRIANGLES_H
 
+//DLP 20230310 include chrono and timinglogger for capturing timings
+#include <chrono>
+#include "timinglogger.h"
+
 #include "utils.h"
 #include <opencv2/opencv.hpp>
 

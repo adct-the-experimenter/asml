@@ -43,6 +43,7 @@ void SkinDetection::setParameters(const int &Y, const int &Cr, const int &Cb, co
 }
 
 void SkinDetection::compute() {
+	logExecTimes.logStart("SkinDetection::compute");
 
     cv::Mat img_skin = img.clone();
 
@@ -146,4 +147,5 @@ void SkinDetection::compute() {
 
     perc = double(100 * countBw) / double(bw.rows * bw.cols);
     std::cout << "Perc: "<< perc << std::endl;*/
+	logExecTimes.logStop("SkinDetection::compute");
 }

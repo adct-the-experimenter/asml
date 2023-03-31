@@ -13,6 +13,9 @@
 #ifndef RGBSEGMENTATION_H
 #define RGBSEGMENTATION_H
 
+//DLP 20230310 include chrono and timinglogger for capturing timings
+#include <chrono>
+#include "timinglogger.h"
 
 #include <opencv2/opencv.hpp>
 #include <delaunaytri.h>

@@ -13,6 +13,10 @@
 #ifndef SKINDETECTION_H
 #define SKINDETECTION_H
 
+//DLP 20230310 include chrono and timinglogger for capturing timings
+#include <chrono>
+#include "timinglogger.h"
+
 #include <opencv2/opencv.hpp>
 
 class SkinDetection

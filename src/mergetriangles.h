@@ -13,6 +13,11 @@
 #ifndef MERGETRIANGLES_H
 #define MERGETRIANGLES_H
 
+//DLP 20230310 include chrono and timinglogger for capturing timings
+#include <chrono>
+#include "timinglogger.h"
+
+
 #include <math.h>
 #include <opencv2/opencv.hpp>
 #include <utils.h>

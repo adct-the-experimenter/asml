@@ -14,8 +14,8 @@
 
 
 EdgeDetector::EdgeDetector(const cv::Mat &src, cv::Mat &edgeImg,
-                           const double &edge_thresh, const double &edge_sigma)
-{
+                           const double &edge_thresh, const double &edge_sigma) {
+	logExecTimes.logStart("EdgeDetector::EdgeDetector");
     if( !src.data ) {
         std::cerr << "Empty Image" << std::endl;
         exit(-1);
@@ -57,12 +57,13 @@ EdgeDetector::EdgeDetector(const cv::Mat &src, cv::Mat &edgeImg,
     thinAndThreshold( mag, dx, dy, _low, _high, dst );
 
     dtMat2Img( dst, edgeImg );
-
+	logExecTimes.logStop("EdgeDetector::EdgeDetector");
 }
 
 EdgeDetector::~EdgeDetector() {}
 
 void EdgeDetector::computGradient(const double &edge_sigma) {
+	logExecTimes.logStart("EdgeDetector::computGradient");
 
     dimKernel = 8*std::ceil(edge_sigma);
 
@@ -122,9 +123,11 @@ void EdgeDetector::computGradient(const double &edge_sigma) {
     {
         derivGaussKernel[negVals[i]] *= den;
     }
+	logExecTimes.logStop("EdgeDetector::computGradient");
 }
 
 void EdgeDetector::gradient() {
+	logExecTimes.logStart("EdgeDetector::gradient");
     derivGaussKernel[0] = gaussKernel[1] - gaussKernel[0];
 
     int end = dimKernel-1;
@@ -137,11 +140,14 @@ void EdgeDetector::gradient() {
     }
 
     derivGaussKernel[dimKernel - 1] = gaussKernel[dimKernel - 1] - gaussKernel[dimKernel - 2];
+	logExecTimes.logStop("EdgeDetector::gradient");
 }
 
 bool EdgeDetector::im2single( const cv::Mat &src, std::vector<double> &mat ) {
+	logExecTimes.logStart("EdgeDetector::im2single");
 
     if( src.channels() != 1 ) {
+		logExecTimes.logStop("EdgeDetector::im2single");
         return false;
     }
 
@@ -175,11 +181,13 @@ bool EdgeDetector::im2single( const cv::Mat &src, std::vector<double> &mat ) {
         }
     }
 
+	logExecTimes.logStop("EdgeDetector::im2single");
     return true;
 }
 
 bool EdgeDetector::imfilter(const std::vector<double> &src, const std::vector<double> &filter,
                              std::vector<double> &_mat, const bool &isTranspose) {
+	logExecTimes.logStart("EdgeDetector::imfilter");
 
     std::vector<double> vec;
     int i, j, k;
@@ -224,22 +232,24 @@ bool EdgeDetector::imfilter(const std::vector<double> &src, const std::vector<do
     }
 
 
+	logExecTimes.logStop("EdgeDetector::imfilter");
     return true;
 }
 
 bool EdgeDetector::smoothGradient(const std::vector<double> &src, std::vector<double> &dx,
                                    std::vector<double> &dy) {
-
+	logExecTimes.logStart("EdgeDetector::smoothGradient");
     imfilter( src, gaussKernel, dx, false );
     imfilter( dx, derivGaussKernel, dx, true );
     imfilter( src, gaussKernel, dy, true );
     imfilter( dy, derivGaussKernel, dy, false );
-
+	logExecTimes.logStop("EdgeDetector::smoothGradient");
     return true;
 }
 
 void EdgeDetector::hypot(const std::vector<double> &dx, const std::vector<double> &dy,
                          std::vector<double> &magGrad) {
+	logExecTimes.logStart("EdgeDetector::hypot");
 
     int i, j;
     double maxValue = 0.0;
@@ -270,22 +280,27 @@ void EdgeDetector::hypot(const std::vector<double> &dx, const std::vector<double
             //offset += cols;
         }
     }
+	logExecTimes.logStop("EdgeDetector::hypot");
 }
 
 void EdgeDetector::selectThresholds(double& lowThresh, double& highThresh, const double &thresh ) {
+	logExecTimes.logStart("EdgeDetector::selectThresholds");
 
     highThresh = thresh;
 
     lowThresh = ThresholdRatio * highThresh;
+	logExecTimes.logStop("EdgeDetector::selectThresholds");
 }
 
 bool EdgeDetector::cannyFindLocalMaxima(const std::vector<double> &src, const std::vector<double> &dx,
                                          const std::vector<double> &dy, const cv::Point2i &pos) {
+	logExecTimes.logStart("EdgeDetector::cannyFindLocalMaxima");
 
     int ix = pos.x;
     int iy = pos.y;
 
     if( ix <= 0 || ix >= rows-1 || iy <= 0 || iy >= cols-1 ) {
+		logExecTimes.logStop("EdgeDetector::cannyFindLocalMaxima");
         return false;
     }
     int ix_cols = ix*cols;
@@ -331,13 +346,14 @@ bool EdgeDetector::cannyFindLocalMaxima(const std::vector<double> &src, const st
         case4 = (gradmag >= gradmag1 && gradmag >= gradmag2);
 
     }
-
+	logExecTimes.logStop("EdgeDetector::cannyFindLocalMaxima");
     return ( case1 || case2 || case3 || case4 );
 
 }
 
 void EdgeDetector::thinAndThreshold( const std::vector<double> &src, const std::vector<double> &dx, const std::vector<double> &dy,
                                      const double& lowThresh, const double& highThresh, std::vector<uchar> &dst) {
+	logExecTimes.logStart("EdgeDetector::thinAndThreshold");
 
     std::vector<uchar> idxWeak(numPixels, 0);
     std::vector<uchar> idxWeakNeg(numPixels, 1);
@@ -371,10 +387,12 @@ void EdgeDetector::thinAndThreshold( const std::vector<double> &src, const std::
 
     bwselect( idxWeak, idxWeakNeg, idxStrongPts, k );
     dst = idxWeak;
+	logExecTimes.logStop("EdgeDetector::thinAndThreshold");
 }
 
 void EdgeDetector::bwselect(std::vector<uchar> &idxWeak, std::vector<uchar> &idxWeakNeg,
                             const std::vector<cv::Point2i> &idxStrongPts, const int &size) {
+	logExecTimes.logStart("EdgeDetector::bwselect");
 
     const int ptSize = size;
     const int d_x[8] = {0, 0,1,1, 1,-1,-1, -1};
@@ -412,9 +430,11 @@ void EdgeDetector::bwselect(std::vector<uchar> &idxWeak, std::vector<uchar> &idx
     {
         idxWeak[i] &= idxWeakNeg[i];
     }
+	logExecTimes.logStop("EdgeDetector::bwselect");
 }
 
 void EdgeDetector::dtMat2Img( const std::vector<uchar> &mat, cv::Mat &img ) {
+	logExecTimes.logStart("EdgeDetector::dtMat2Img");
 
     img = cv::Mat( cv::Size(cols, rows), CV_8UC1 );
 
@@ -427,4 +447,5 @@ void EdgeDetector::dtMat2Img( const std::vector<uchar> &mat, cv::Mat &img ) {
         }
         offset += cols;
     }
+	logExecTimes.logStop("EdgeDetector::dtMat2Img");
 }
