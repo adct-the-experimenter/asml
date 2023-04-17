@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_DEBUG} -Wdelete-non-virtual-dtor")
 
-project( nei_gui )
+project( nei_gui LANGUAGES CXX CUDA)
 
 find_package(Boost COMPONENTS filesystem regex)
 find_package(OpenCV REQUIRED)
@@ -9,6 +9,32 @@ find_package(CGAL QUIET COMPONENTS Core )
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
+find_package(CUDA REQUIRED)
+
+# CUDA specific flags
+
+# set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --verbose")
+
+# For some MPs it may be necessary to specify the compute capability of your
+# NVIDIA GPU. In that case, simply uncomment the following two lines that start
+# with 'set' and change the value of COMPUTE_CAPABILITY to one of the following
+# hardware architectures: Tesla-class '11', '12', or '13'; Fermi-class '20'
+# or '21'; Kepler-class '30', '32', '35'; or Maxwell-class '50' or '52'
+set(COMPUTE_CAPABILITY 60)
+# set(CUDA_SEPARABLE_COMPILATION TRUE)
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --gpu-architecture;sm_${COMPUTE_CAPABILITY}")
+# list(APPEND CUDA_NVCC_FLAGS -arch=sm_35)
+
+# Set warning levels for host compilation
+if (UNIX)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-function -Wno-unused-parameter -Wextra -std=c++11")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused-function -Wno-unused-parameter -Wextra")
+	set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xcompiler -Wno-unused-function,-Wno-unused-parameter")
+	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
+	# Add debugging to CUDA NVCC flags (for NVidia's NSight tools)
+	set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG} "-G")
+endif ()
 
 #INCLUDE(${QT_USE_FILE})
 include( ${CGAL_USE_FILE} )
@@ -33,12 +59,23 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(EXECUTABLE_OUTPUT_PATH ../bin)
 file(GLOB_RECURSE objectannotationtool_src "src/*.cpp")
 
+file(GLOB_RECURSE cu_objectannotationtool_src "src/*.cu")
+
 QT5_WRAP_UI(UI_INTERFACE 
 			gui/mainwindow.ui 
 )
 
+include_directories(/contrib/ece569/libs/include)
+link_directories(/contrib/ece569/libs/lib64)
+
 include_directories(${Boost_INCLUDE_DIRS} ${CMAKE_BINARY_DIR} src)
-add_executable( nei_gui ${objectannotationtool_src} ${UI_INTERFACE})
+
+#add CUDA (.cu) sources to programs directly in calls to add_library() and add_executable().
+add_executable( nei_gui ${objectannotationtool_src} ${UI_INTERFACE} ${cu_objectannotationtool_src})
+
+set_property(TARGET nei_gui 
+             PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+
 target_link_libraries( nei_gui ${Boost_LIBRARIES} ${OpenCV_LIBS} Qt5::Core
     Qt5::Gui
     Qt5::Widgets )
