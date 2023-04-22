@@ -538,7 +538,6 @@ void MainWindow::process() {
 
     delete tmpImg_neo;
 
-	test_kernel_wrapper();
 
     //EQ
     std::vector<cv::Mat> channels;

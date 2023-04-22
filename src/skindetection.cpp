@@ -12,6 +12,8 @@
 
 #include "skindetection.h"
 
+#include "kernels/kernel.cuh"
+
 SkinDetection::SkinDetection(const cv::Mat &img)
 {
     this->img = img;
@@ -82,10 +84,38 @@ void SkinDetection::compute() {
                 img_skin.at<cv::Vec3b>(i, j) = img.at<cv::Vec3b>(i, j);
         }
     }
+	
+    //********************************
+    //Substitution for bgr to hsv
+    //********************************
 
-	//DLP 20230310 updated to use current constant naming convention
-    //cv::cvtColor(img_skin, hsv, CV_BGR2HSV);
-    cv::cvtColor(img_skin, hsv, cv::COLOR_BGR2HSV);
+    //Getting height, width, channels
+    int height = img_skin.rows;
+    int width = img_skin.cols;
+    int imageChannels = img_skin.channels();
+
+    //allocate memory on device
+    unsigned char *hostBGRImageData;
+	unsigned char *hostHSVImageData;
+	
+	//Converting Mat to float
+    cv::Mat dst_bgr;
+    img_skin.copyTo(dst_bgr);
+    hostBGRImageData = dst_bgr.ptr<unsigned char>();
+    
+    hsv.create(height, width, CV_8U);
+    hostHSVImageData = hsv.ptr<unsigned char>();
+    
+    //call kernel that converts bgr to hsv
+    bgr_to_hsv_kernel_wrapper(hostBGRImageData, hostHSVImageData, width, height, imageChannels);
+    
+    //Converting output array back into Mat
+    cv::Mat temp(height, width, CV_8U, hostHSVImageData);
+	temp.copyTo(hsv);
+
+	//********************************
+	// end substitution for bgr to hsv
+	//********************************
 
     for(int i = 0; i < img.rows; i++) {
         for(int j = 0; j< img.cols; j++) {
