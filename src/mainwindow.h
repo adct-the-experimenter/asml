@@ -13,8 +13,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <cuda.h>
-#include "kernel.cu" //for kernel functions.
 
 #include <QMainWindow>
 #include <QSignalMapper>

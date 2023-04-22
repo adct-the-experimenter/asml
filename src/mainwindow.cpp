@@ -13,6 +13,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <opencv2/cudaarithm.hpp> //for opencv cuda functions
+#include <opencv2/cudaimgproc.hpp> //for opencv cuda functions
+
+
+#include <stdio.h>
+#include "kernels/kernel.cuh" //for kernel functions that use CUDA
+
 int countImages = 0;
 // global vector for capturing execution times
 ExecTimeLogger logExecTimes;
@@ -531,26 +538,33 @@ void MainWindow::process() {
 
     delete tmpImg_neo;
 
+	test_kernel_wrapper();
+
     //EQ
-    std::vector<cv::Mat> channels;
-    cv::Mat img_hist_equalized;
+    std::vector<cv::cuda::GpuMat> channels;
+	cv::cuda::GpuMat d_rgb; d_rgb.upload(rgb);
+    cv::cuda::GpuMat img_hist_equalized;
+	
 	//DLP 20230310 updated to reflect current constant name
     //cv::cvtColor(rgb, img_hist_equalized, CV_BGR2YCrCb); //change the color image from BGR to YCrCb format
-    cv::cvtColor(rgb, img_hist_equalized, cv::COLOR_BGR2YCrCb); //change the color image from BGR to YCrCb format
+	logExecTimes.logStart("Line 540 cvtColor cuda");
+	
+    cv::cuda::cvtColor(d_rgb, img_hist_equalized, cv::COLOR_BGR2YCrCb); //change the color image from BGR to YCrCb format
 
-    cv::split(img_hist_equalized,channels); //split the image into channels
+	logExecTimes.logStop("Line 540 cvtColor cuda");
 
-    cv::equalizeHist(channels[0], channels[0]); //equalize histogram on the 1st channel (Y)
+    cv::cuda::split(img_hist_equalized,channels); //split the image into channels
 
-    cv::merge(channels,img_hist_equalized); //merge 3 channels including the modified 1st channel into one image
+    cv::cuda::equalizeHist(channels[0], channels[0]); //equalize histogram on the 1st channel (Y)
+
+    cv::cuda::merge(channels,img_hist_equalized); //merge 3 channels including the modified 1st channel into one image
 
 	//DLP 20230310 updated to reflect current constant name
     //cv::cvtColor(img_hist_equalized, img_hist_equalized, CV_YCrCb2BGR);
-    cv::cvtColor(img_hist_equalized, img_hist_equalized, cv::COLOR_YCrCb2BGR);
+    cv::cuda::cvtColor(img_hist_equalized, img_hist_equalized, cv::COLOR_YCrCb2BGR);
 
     cv::Mat rgb_new;
-    rgb_new = img_hist_equalized.clone();
-
+    img_hist_equalized.download(rgb_new);
     //cv::imshow("eq", img_hist_equalized);
 
     //Hair Removal
@@ -561,7 +575,18 @@ void MainWindow::process() {
 
     int vv1 = 40;//80
 
-    rgb_new += cv::Scalar(vv1, vv1, vv1);
+	
+    logExecTimes.logStart("rgb scalar add serial");
+	rgb_new += cv::Scalar(vv1, vv1, vv1);
+    logExecTimes.logStop("rgb scalar add serial");
+
+/*
+	logExecTimes.logStart("rgb scalar add cuda");
+	cv::cuda::GpuMat d_rgb_new; d_rgb_new.upload(rgb_new);
+	cv::cuda::add	(d_rgb_new,vv1,d_rgb_new);
+	d_rgb_new.download(rgb_new);	
+	logExecTimes.logStop("rgb scalar add cuda");	
+*/
 
     //Edge Detection
     cv::Mat grayImg;
@@ -616,9 +641,6 @@ void MainWindow::process() {
             }
         }
     }
-
-
-
 
     std::vector < std::vector<cv::Point> > contours, filteredContours;
 

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_DEBUG} -Wdelete-non-virtual-dtor")
 
 project( nei_gui LANGUAGES CXX CUDA)
+enable_language(CUDA)
 
 find_package(Boost COMPONENTS filesystem regex)
 find_package(OpenCV REQUIRED)
@@ -24,6 +25,7 @@ set(COMPUTE_CAPABILITY 60)
 # set(CUDA_SEPARABLE_COMPILATION TRUE)
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --gpu-architecture;sm_${COMPUTE_CAPABILITY}")
 # list(APPEND CUDA_NVCC_FLAGS -arch=sm_35)
+enable_language(CUDA)
 
 # Set warning levels for host compilation
 if (UNIX)
@@ -35,6 +37,12 @@ if (UNIX)
 	# Add debugging to CUDA NVCC flags (for NVidia's NSight tools)
 	set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG} "-G")
 endif ()
+
+# set CU FILES
+file(GLOB CUDA_FILES "src/" *.cu)
+CUDA_COMPILE(CU_O ${CUDA_FILES})
+
+#CPP specific compile
 
 #INCLUDE(${QT_USE_FILE})
 include( ${CGAL_USE_FILE} )
@@ -68,14 +76,18 @@ QT5_WRAP_UI(UI_INTERFACE
 include_directories(/contrib/ece569/libs/include)
 link_directories(/contrib/ece569/libs/lib64)
 
-include_directories(${Boost_INCLUDE_DIRS} ${CMAKE_BINARY_DIR} src)
+set(CUDA_MANUAL_INCLUDE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+include_directories(${Boost_INCLUDE_DIRS} ${CMAKE_BINARY_DIR} ${CUDA_MANUAL_INCLUDE} src)
 
 #add CUDA (.cu) sources to programs directly in calls to add_library() and add_executable().
-add_executable( nei_gui ${objectannotationtool_src} ${UI_INTERFACE} ${cu_objectannotationtool_src})
 
-set_property(TARGET nei_gui 
+set_property(TARGET ${CU_O} 
              PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+
+add_executable( nei_gui ${objectannotationtool_src} ${UI_INTERFACE} )
+add_subdirectory(src/kernels)
 
 target_link_libraries( nei_gui ${Boost_LIBRARIES} ${OpenCV_LIBS} Qt5::Core
     Qt5::Gui
-    Qt5::Widgets )
+    Qt5::Widgets 
+	kernels)
