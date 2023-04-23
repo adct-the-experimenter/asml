@@ -21,7 +21,7 @@ return;
 
 }
 
-__global__ void bgr_to_hsv_kernel(unsigned char* bgrImage, unsigned char* hsvImage, int width, int height, int imageChannels)
+__global__ void bgr_to_hsv_kernel_v1(unsigned char* bgrImage, unsigned char* hsvImage, int width, int height, int imageChannels)
 {
 	//determine column of single pixel in image based on thread index
 	int col = threadIdx.x + blockDim.x*blockIdx.x; //x for column
@@ -44,7 +44,7 @@ __global__ void bgr_to_hsv_kernel(unsigned char* bgrImage, unsigned char* hsvIma
 		r = r / 255.0f;
 		g = g / 255.0f;
 		b = b / 255.0f;
-		//a = pixel.w;
+		
 	
 		float max = fmax(r, fmax(g, b));
 		float min = fmin(r, fmin(g, b));
@@ -80,7 +80,7 @@ __global__ void bgr_to_hsv_kernel(unsigned char* bgrImage, unsigned char* hsvIma
 }
 
 	
-void bgr_to_hsv_kernel_wrapper(unsigned char* bgrImage, unsigned char* hsvImage, int width, int height, int imageChannels)
+void bgr_to_hsv_kernel_v1_wrapper(unsigned char* bgrImage, unsigned char* hsvImage, int width, int height, int imageChannels)
 {
 	//allocate memory to device
 	unsigned char *deviceBGRImageData;
@@ -106,7 +106,7 @@ void bgr_to_hsv_kernel_wrapper(unsigned char* bgrImage, unsigned char* hsvImage,
 	dim3 gridDimensions( xdim, ydim, 1);
 	
 	//call kernel function to convert bgr to hsv
-	bgr_to_hsv_kernel <<<gridDimensions,blockDimensions>>>(deviceBGRImageData,deviceHSVImageData,width,height,imageChannels);
+	bgr_to_hsv_kernel_v1 <<<gridDimensions,blockDimensions>>>(deviceBGRImageData,deviceHSVImageData,width,height,imageChannels);
 	
 	//copy device hsv image data to output
 	cudaMemcpy(deviceHSVImageData, hsvImage,

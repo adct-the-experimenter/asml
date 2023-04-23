@@ -85,6 +85,7 @@ void SkinDetection::compute() {
         }
     }
 	
+	//cv::cvtColor(img_skin, hsv, cv::COLOR_BGR2HSV);	
     //********************************
     //Substitution for bgr to hsv
     //********************************
@@ -93,6 +94,7 @@ void SkinDetection::compute() {
     int height = img_skin.rows;
     int width = img_skin.cols;
     int imageChannels = img_skin.channels();
+	printf("imgSKin height,width,channels: %d, %d, %d\n",height,width,imageChannels);
 
     //allocate memory on device
     unsigned char *hostBGRImageData;
@@ -103,15 +105,16 @@ void SkinDetection::compute() {
     img_skin.copyTo(dst_bgr);
     hostBGRImageData = dst_bgr.ptr<unsigned char>();
     
-    hsv.create(height, width, CV_8U);
+    hsv.create(height, width, CV_8UC3);
     hostHSVImageData = hsv.ptr<unsigned char>();
     
     //call kernel that converts bgr to hsv
-    bgr_to_hsv_kernel_wrapper(hostBGRImageData, hostHSVImageData, width, height, imageChannels);
+    bgr_to_hsv_kernel_v1_wrapper(hostBGRImageData, hostHSVImageData, width, height, imageChannels);
     
     //Converting output array back into Mat
-    cv::Mat temp(height, width, CV_8U, hostHSVImageData);
+    cv::Mat temp(height, width, CV_8UC3, hostHSVImageData);
 	temp.copyTo(hsv);
+	printf("hsv height,width,channels: %d, %d, %d\n",hsv.rows,hsv.cols,hsv.channels());
 
 	//********************************
 	// end substitution for bgr to hsv

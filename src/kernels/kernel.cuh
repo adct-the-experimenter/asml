@@ -5,6 +5,6 @@
 
 void test_kernel_wrapper();
 
-void bgr_to_hsv_kernel_wrapper(unsigned char* bgrImage, unsigned char* hsvImage, int width, int height, int imageChannels);
+void bgr_to_hsv_kernel_v1_wrapper(unsigned char* bgrImage, unsigned char* hsvImage, int width, int height, int imageChannels);
 
 #endif
