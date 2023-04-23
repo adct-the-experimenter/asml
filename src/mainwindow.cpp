@@ -196,6 +196,9 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
 	//########### Substitution for CUDA enabled kernel ###########
     //cv::cvtColor(temp, gg, CV_BGR2GRAY);
 
+    //Timing
+    logExecTimes.logStart("BGR2GRAY_1_naive");
+
     //Getting height & width
     int rows = temp.rows;
     int cols = temp.cols;
@@ -215,6 +218,11 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
     //Converting output array back into Mat
     cv::Mat dest(rows, cols, CV_32FC1, output);
     dest.convertTo(gg, CV_8U);
+
+    //Timing
+    logExecTimes.logStop("BGR2GRAY_1_naive");
+
+    //############################################################
 
     //############################################################
 

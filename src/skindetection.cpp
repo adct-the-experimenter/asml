@@ -85,6 +85,8 @@ void SkinDetection::compute() {
         }
     }
 	
+	cv::cvtColor(img_skin, hsv, cv::COLOR_BGR2HSV);
+/*
     //********************************
     //Substitution for bgr to hsv
     //********************************
@@ -116,6 +118,7 @@ void SkinDetection::compute() {
 	//********************************
 	// end substitution for bgr to hsv
 	//********************************
+*/
 
     for(int i = 0; i < img.rows; i++) {
         for(int j = 0; j< img.cols; j++) {
