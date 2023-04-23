@@ -45,7 +45,7 @@ void SkinDetection::setParameters(const int &Y, const int &Cr, const int &Cb, co
 }
 
 void SkinDetection::compute() {
-	logExecTimes.logStart("SkinDetection::compute");
+	logExecTimes.logStart("SkinDetection::compute cuda");
 
     cv::Mat img_skin = img.clone();
 
@@ -85,7 +85,9 @@ void SkinDetection::compute() {
         }
     }
 	
-	//cv::cvtColor(img_skin, hsv, cv::COLOR_BGR2HSV);	
+	//cv::cvtColor(img_skin, hsv, cv::COLOR_BGR2HSV);
+
+	
     //********************************
     //Substitution for bgr to hsv
     //********************************
@@ -94,31 +96,29 @@ void SkinDetection::compute() {
     int height = img_skin.rows;
     int width = img_skin.cols;
     int imageChannels = img_skin.channels();
-	printf("imgSKin height,width,channels: %d, %d, %d\n",height,width,imageChannels);
 
     //allocate memory on device
     unsigned char *hostBGRImageData;
 	unsigned char *hostHSVImageData;
 	
 	//Converting Mat to float
-    cv::Mat dst_bgr;
-    img_skin.copyTo(dst_bgr);
-    hostBGRImageData = dst_bgr.ptr<unsigned char>();
+    hostBGRImageData = img_skin.data;
     
-    hsv.create(height, width, CV_8UC3);
-    hostHSVImageData = hsv.ptr<unsigned char>();
+    //hsv.create(height, width, CV_8U);
+	hsv = cv::Mat::ones(height,width,CV_8U);
+    hostHSVImageData = hsv.data;
     
     //call kernel that converts bgr to hsv
     bgr_to_hsv_kernel_v1_wrapper(hostBGRImageData, hostHSVImageData, width, height, imageChannels);
     
     //Converting output array back into Mat
-    cv::Mat temp(height, width, CV_8UC3, hostHSVImageData);
+    cv::Mat temp(height, width, CV_8U, hostHSVImageData);
 	temp.copyTo(hsv);
-	printf("hsv height,width,channels: %d, %d, %d\n",hsv.rows,hsv.cols,hsv.channels());
 
 	//********************************
 	// end substitution for bgr to hsv
 	//********************************
+
 
     for(int i = 0; i < img.rows; i++) {
         for(int j = 0; j< img.cols; j++) {
@@ -180,5 +180,5 @@ void SkinDetection::compute() {
 
     perc = double(100 * countBw) / double(bw.rows * bw.cols);
     std::cout << "Perc: "<< perc << std::endl;*/
-	logExecTimes.logStop("SkinDetection::compute");
+	logExecTimes.logStop("SkinDetection::compute cuda");
 }

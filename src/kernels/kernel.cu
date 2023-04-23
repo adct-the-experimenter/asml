@@ -108,6 +108,8 @@ void bgr_to_hsv_kernel_v1_wrapper(unsigned char* bgrImage, unsigned char* hsvIma
 	//call kernel function to convert bgr to hsv
 	bgr_to_hsv_kernel_v1 <<<gridDimensions,blockDimensions>>>(deviceBGRImageData,deviceHSVImageData,width,height,imageChannels);
 	
+	cudaDeviceSynchronize();//wait for all threads to complete
+
 	//copy device hsv image data to output
 	cudaMemcpy(deviceHSVImageData, hsvImage,
              width * height * imageChannels * sizeof(unsigned char),
