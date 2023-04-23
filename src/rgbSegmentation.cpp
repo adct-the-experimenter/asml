@@ -16,7 +16,7 @@ RgbSegmentation::RgbSegmentation(const cv::Mat &img, const cv::Mat &rgbImg,
                                  std::vector<cv::Point2i> XYPoints,
                                  const double &sigma_blurring, const double &sigma_c,
                                  const double &merge_threshold, cv::Mat &RgbLabels) {
-	logExecTimes.logStart("rgbSegmentation::RgbSegmentation");
+	//logExecTimes.logStart("rgbSegmentation::RgbSegmentation");
     rows = img.rows;
     cols = img.cols;
     pixelNumber = rows * cols;
@@ -112,14 +112,14 @@ RgbSegmentation::RgbSegmentation(const cv::Mat &img, const cv::Mat &rgbImg,
     const std::vector<double>& labels2 = this->compactLabels(tri_labels, labels);
 
     RgbLabels = colorImageSegments(img, labels2, cv::Scalar(0, 0, 255));
-	logExecTimes.logStop("rgbSegmentation::RgbSegmentation");
+	//logExecTimes.logStop("rgbSegmentation::RgbSegmentation");
 }
 
 RgbSegmentation::~RgbSegmentation(){}
 
 cv::Mat RgbSegmentation::colorImageSegments(const cv::Mat &bgr, const std::vector<double>& labels,
                                             const cv::Scalar &color) {
-	logExecTimes.logStart("rgbSegmentation::colorImageSegments");
+	//logExecTimes.logStart("rgbSegmentation::colorImageSegments");
     int i, j, k;
     std::vector<cv::Mat> bgr_planes;
     cv::split(bgr.clone(), bgr_planes);
@@ -208,38 +208,38 @@ cv::Mat RgbSegmentation::colorImageSegments(const cv::Mat &bgr, const std::vecto
             bgrNew.at<cv::Vec3b>(i,j)[2] = lut[k * 3 + 2] * 255;
         }
     }
-	logExecTimes.logStop("rgbSegmentation::colorImageSegments");
+	//logExecTimes.logStop("rgbSegmentation::colorImageSegments");
     return bgrNew;
 }
 
 int RgbSegmentation::maxVal(const std::vector<int>& vec){
-	logExecTimes.logStart("rgbSegmentation::maxVal");
+	//logExecTimes.logStart("rgbSegmentation::maxVal");
     int maxV = -1000;
     int i, end = pixelNumber;
     for(i = 0; i < end; ++i) {
         if(vec[i] > maxV)
             maxV = vec[i];
     }
-	logExecTimes.logStop("rgbSegmentation::maxVal");
+	//logExecTimes.logStop("rgbSegmentation::maxVal");
     return maxV;
 }
 
 int RgbSegmentation::findVal(const std::vector<int>& vec, const int &elem, const int &start){
-	logExecTimes.logStart("rgbSegmentation::findVal");
+	//logExecTimes.logStart("rgbSegmentation::findVal");
     int idx = -1000;
     int i;
     for( i = start; i < pixelNumber; ++i)
     {
         if(elem == vec[i])
-			logExecTimes.logStop("rgbSegmentation::findVal");
+			//logExecTimes.logStop("rgbSegmentation::findVal");
             return i;
     }
-	logExecTimes.logStop("rgbSegmentation::findVal");
+	//logExecTimes.logStop("rgbSegmentation::findVal");
     return idx;
 }
 
 std::vector<double> RgbSegmentation::accumarray(const std::vector<int>& subs, const std::vector<double>& vals){
-	logExecTimes.logStart("rgbSegmentation::accumarray");
+	//logExecTimes.logStart("rgbSegmentation::accumarray");
     int i;
 
     labelSize = maxVal(subs);
@@ -263,12 +263,12 @@ std::vector<double> RgbSegmentation::accumarray(const std::vector<int>& subs, co
         out[i] = elements[i].sum / (double)(elements[i].index);
     }
 
-	logExecTimes.logStop("rgbSegmentation::accumarray");
+	//logExecTimes.logStop("rgbSegmentation::accumarray");
     return out;
 }
 
 std::vector<double> RgbSegmentation::compactLabels(const std::vector<int>& tri_labels, const std::vector<double>& labels){
-	logExecTimes.logStart("rgbSegmentation::compactLabels");
+	//logExecTimes.logStart("rgbSegmentation::compactLabels");
     std::vector<double> newLabels = labels;
     std::vector<int> labelVectA, labelVectC, labelVectIc;
 
@@ -328,14 +328,14 @@ std::vector<double> RgbSegmentation::compactLabels(const std::vector<int>& tri_l
         }
     }
 
-	logExecTimes.logStop("rgbSegmentation::compactLabels");
+	//logExecTimes.logStop("rgbSegmentation::compactLabels");
     return newLabels;
 }
 
 std::vector<int> RgbSegmentation::integrate_merges(const std::vector<int>& old_labels,
                                                    const std::vector<int>& new_labels,
                                                    const double &merge_threshold) {
-	logExecTimes.logStart("rgbSegmentation::integrate_merges");
+	//logExecTimes.logStart("rgbSegmentation::integrate_merges");
     std::vector<int> lut(sizeTriangles), tail(sizeTriangles), next(sizeTriangles);
 
     for(int i = 0; i < sizeTriangles; ++i)
@@ -370,12 +370,12 @@ std::vector<int> RgbSegmentation::integrate_merges(const std::vector<int>& old_l
             }
         }
     }
-	logExecTimes.logStop("rgbSegmentation::integrate_merges");
+	//logExecTimes.logStop("rgbSegmentation::integrate_merges");
     return lut;
 }
 
 cv::Mat RgbSegmentation::mat2cvMat(const std::vector<double>& rgb) {
-	logExecTimes.logStart("rgbSegmentation::mat2cvMat");
+	//logExecTimes.logStart("rgbSegmentation::mat2cvMat");
     int i, j;
     int doublePixelNumber = pixelNumber*2;
 	cv::Mat img = cv::Mat(cv::Size(rows, cols), CV_8UC3);
@@ -390,12 +390,12 @@ cv::Mat RgbSegmentation::mat2cvMat(const std::vector<double>& rgb) {
         }
     }
 
-	logExecTimes.logStop("rgbSegmentation::mat2cvMat");
+	//logExecTimes.logStop("rgbSegmentation::mat2cvMat");
     return img;
 }
 
 std::vector<double> RgbSegmentation::cvMat2Mat(const cv::Mat &mat) {
-	logExecTimes.logStart("rgbSegmentation::cvMat2Mat");
+	//logExecTimes.logStart("rgbSegmentation::cvMat2Mat");
     std::vector<double> img(pixelNumber * 3, 0.);
     int i, j;
     int doublePixelNumber = pixelNumber*2;
@@ -410,12 +410,12 @@ std::vector<double> RgbSegmentation::cvMat2Mat(const cv::Mat &mat) {
         }
     }
 
-	logExecTimes.logStop("rgbSegmentation::cvMat2Mat");
+	//logExecTimes.logStop("rgbSegmentation::cvMat2Mat");
     return img;
 }
 
 std::vector<double> RgbSegmentation::dtMat2mat(const std::vector<double>& src) {
-	logExecTimes.logStart("rgbSegmentation::dtMat2mat");
+	//logExecTimes.logStart("rgbSegmentation::dtMat2mat");
     std::vector<double> bgr(pixelNumber * 3, 0.);
     int i, j;
     int doublePixelNumber = pixelNumber*2;
@@ -430,13 +430,13 @@ std::vector<double> RgbSegmentation::dtMat2mat(const std::vector<double>& src) {
         }
     }
 
-	logExecTimes.logStop("rgbSegmentation::dtMat2mat");
+	//logExecTimes.logStop("rgbSegmentation::dtMat2mat");
     return bgr;
 }
 
 bool RgbSegmentation::imfilter(const std::vector<double>& src, const std::vector<double>& filter,
                              std::vector<double>& _mat, const bool &isTranspose, const int &plane) {
-	logExecTimes.logStart("rgbSegmentation::imfilter");
+	//logExecTimes.logStart("rgbSegmentation::imfilter");
 
     int factor = pixelNumber*plane;
     int i, j, k;
@@ -485,15 +485,15 @@ bool RgbSegmentation::imfilter(const std::vector<double>& src, const std::vector
             }
         }
     }
-	logExecTimes.logStop("rgbSegmentation::imfilter");
+	//logExecTimes.logStop("rgbSegmentation::imfilter");
     return true;
 }
 
 bool RgbSegmentation::im2single( const cv::Mat &src, std::vector<double>& mat, const int& plane ) {
-	logExecTimes.logStart("rgbSegmentation::im2single");
+	//logExecTimes.logStart("rgbSegmentation::im2single");
     if( src.channels() != 1 )
     {
-		logExecTimes.logStop("rgbSegmentation::im2single");
+		//logExecTimes.logStop("rgbSegmentation::im2single");
         return false;
     }
 
@@ -527,13 +527,13 @@ bool RgbSegmentation::im2single( const cv::Mat &src, std::vector<double>& mat, c
         }
     }
 
-	logExecTimes.logStop("rgbSegmentation::im2single");
+	//logExecTimes.logStop("rgbSegmentation::im2single");
     return true;
 }
 
 void RgbSegmentation::rgbtolab()
 {
-	logExecTimes.logStart("rgbSegmentation::rgbtolab");
+	//logExecTimes.logStart("rgbSegmentation::rgbtolab");
     int i, j;
     mean_color_lab = std::vector<double>(sizeTriangles*3, 0.);//allocateMatrix<double>(sizeTriangles, 3, true, 0.);
     int size = 3;
@@ -584,11 +584,11 @@ void RgbSegmentation::rgbtolab()
         mean_color_lab[offset + 2] = 200. * (*(XYZ + 1) - *(XYZ + 2));
         offset += 3;
     }
-	logExecTimes.logStop("rgbSegmentation::rgbtolab");
+	//logExecTimes.logStop("rgbSegmentation::rgbtolab");
 }
 
 void RgbSegmentation::computeSquaredEdgeDistances(const double &sigma_c) {
-	logExecTimes.logStart("rgbSegmentation::computeSquaredEdgeDistances");
+	//logExecTimes.logStart("rgbSegmentation::computeSquaredEdgeDistances");
     int size = 3, k, i, j;
 
     std::vector<double> dc2 = std::vector<double>(sizeTriangles*size, 0.);//allocateMatrix<double>(sizeTriangles, size, true, 0.);
@@ -631,12 +631,12 @@ void RgbSegmentation::computeSquaredEdgeDistances(const double &sigma_c) {
         }
         offset += size;
     }
-	logExecTimes.logStop("rgbSegmentation::computeSquaredEdgeDistances");
+	//logExecTimes.logStop("rgbSegmentation::computeSquaredEdgeDistances");
 }
 
 void RgbSegmentation::mxCircleStats(const std::vector<double>& radii, const std::vector<cv::Point2d>& centers,
                                     const std::vector<double>& RGBb) {
-	logExecTimes.logStart("rgbSegmentation::mxCircleStats");
+	//logExecTimes.logStart("rgbSegmentation::mxCircleStats");
     const int ndims = 3; //CHANGE FOR BLACK AND WHITE
 
     mean_color_rgb = std::vector<double>(sizeTriangles*3, 0.);
@@ -693,22 +693,22 @@ void RgbSegmentation::mxCircleStats(const std::vector<double>& radii, const std:
         }
         offset += ndims;
     }
-	logExecTimes.logStop("rgbSegmentation::mxCircleStats");
+	//logExecTimes.logStop("rgbSegmentation::mxCircleStats");
 }
 
 void RgbSegmentation::quicksort(std::vector<cv::Point2i> &XYpoints, int p, int r)
 {
-	logExecTimes.logStart("rgbSegmentation::quicksort");
+	//logExecTimes.logStart("rgbSegmentation::quicksort");
     if ( p < r ) {
         int j = partition(XYpoints, p, r);
         quicksort(XYpoints, p, j-1);
         quicksort(XYpoints, j+1, r);
     }
-	logExecTimes.logStop("rgbSegmentation::quicksort");
+	//logExecTimes.logStop("rgbSegmentation::quicksort");
 }
 
 int RgbSegmentation::partition(std::vector<cv::Point2i> &XYpoints, int p, int r) {
-	logExecTimes.logStart("rgbSegmentation::partition");
+	//logExecTimes.logStart("rgbSegmentation::partition");
 
     int pivot = XYpoints[r].x;
 
@@ -730,14 +730,14 @@ int RgbSegmentation::partition(std::vector<cv::Point2i> &XYpoints, int p, int r)
             XYpoints[r] = temp;
         }
     }
-	logExecTimes.logStop("rgbSegmentation::partition");
+	//logExecTimes.logStop("rgbSegmentation::partition");
     return r;
 }
 
 
 void RgbSegmentation::computeCircumcircleOverlap(const std::vector<double>& radii, const std::vector<cv::Point2d>& centers,
                                                  const std::vector<double>& neighbors) {
-	logExecTimes.logStart("rgbSegmentation::computeCircumcircleOverlap");
+	//logExecTimes.logStart("rgbSegmentation::computeCircumcircleOverlap");
 	edge_lengths = std::vector<double>(sizeTriangles*3, 0.);
 
 	double radii_;
@@ -787,5 +787,5 @@ void RgbSegmentation::computeCircumcircleOverlap(const std::vector<double>& radi
 		    offset += 3;
 	    }
     }
-	logExecTimes.logStop("rgbSegmentation::computeCircumcircleOverlap");
+	//logExecTimes.logStop("rgbSegmentation::computeCircumcircleOverlap");
 }

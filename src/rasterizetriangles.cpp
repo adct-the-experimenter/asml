@@ -15,7 +15,7 @@
 
 RasterizeTriangles::RasterizeTriangles(const int &rows, const int &cols, const std::vector<cv::Point2i> &XYPoints,
                                        const std::vector<int> &indices, const int &size) {
-	logExecTimes.logStart("RasterizeTriangles::RasterizeTriangles");
+	//logExecTimes.logStart("RasterizeTriangles::RasterizeTriangles");
     this->nrows = rows;
     this->ncols = cols;
 
@@ -50,11 +50,11 @@ RasterizeTriangles::RasterizeTriangles(const int &rows, const int &cols, const s
         // Draw the triangle
         rasterizeTriangle (&edge1, &edge2, &edge3, i + 1);
    }
-	logExecTimes.logStop("RasterizeTriangles::RasterizeTriangles");
+	//logExecTimes.logStop("RasterizeTriangles::RasterizeTriangles");
 }
 
 edge RasterizeTriangles::makeEdge(const cv::Point2i &P, const cv::Point2i &Q) {
-	logExecTimes.logStart("RasterizeTriangles::makeEdge");
+	//logExecTimes.logStart("RasterizeTriangles::makeEdge");
     edge theEdge;
 
     if (P.y < Q.y) {
@@ -64,7 +64,7 @@ edge RasterizeTriangles::makeEdge(const cv::Point2i &P, const cv::Point2i &Q) {
         theEdge.P1 = Q;
         theEdge.P2 = P;
     }
-	logExecTimes.logStop("RasterizeTriangles::makeEdge");
+	//logExecTimes.logStop("RasterizeTriangles::makeEdge");
     return theEdge;
 }
 
@@ -76,16 +76,16 @@ int RasterizeTriangles::edgeHeight (edge *theEdge) {
 
 void RasterizeTriangles::updateLineExtents (const int &row, const int &col)
 {
-	logExecTimes.logStart("RasterizeTriangles::updateLineExtents");
+	//logExecTimes.logStart("RasterizeTriangles::updateLineExtents");
     if ( (row >= 0) && (row < nrows) ) {
         if (col < min_col_buffer[row]) min_col_buffer[row] = col;
         if (col > max_col_buffer[row]) max_col_buffer[row] = col;
     }
-	logExecTimes.logStop("RasterizeTriangles::updateLineExtents");
+	//logExecTimes.logStop("RasterizeTriangles::updateLineExtents");
 }
 
 void RasterizeTriangles::DrawSpans (const int &row1, const int &row2, const int &label) {
-	logExecTimes.logStart("RasterizeTriangles::DrawSpans");
+	//logExecTimes.logStart("RasterizeTriangles::DrawSpans");
     int row, col, min_col, max_col;
 
     for (row = row1; row <= row2; ++row) {
@@ -103,11 +103,11 @@ void RasterizeTriangles::DrawSpans (const int &row1, const int &row2, const int 
             rasterizedImage[row*ncols + col] = (double)label;
         }
     }
-	logExecTimes.logStop("RasterizeTriangles::DrawSpans");
+	//logExecTimes.logStop("RasterizeTriangles::DrawSpans");
 }
 
 void RasterizeTriangles::rasterizeEdge(edge *theEdge) {
-	logExecTimes.logStart("RasterizeTriangles::rasterizeEdge");
+	//logExecTimes.logStart("RasterizeTriangles::rasterizeEdge");
     int x1 = theEdge->P1.x;
     int y1 = theEdge->P1.y;
 
@@ -137,20 +137,20 @@ void RasterizeTriangles::rasterizeEdge(edge *theEdge) {
         }
 
     }
-	logExecTimes.logStop("RasterizeTriangles::rasterizeEdge");
+	//logExecTimes.logStop("RasterizeTriangles::rasterizeEdge");
 }
 
 void RasterizeTriangles::rasterizeTriangle(edge *edge1, edge *edge2, edge *edge3, const int &label) {
-	logExecTimes.logStart("RasterizeTriangles::rasterizeTriangle");
-	logExecTimes.logStart("RasterizeTriangles::edgeHeight");
+	//logExecTimes.logStart("RasterizeTriangles::rasterizeTriangle");
+	//logExecTimes.logStart("RasterizeTriangles::edgeHeight");
     int height1 = RasterizeTriangles::edgeHeight(edge1);
-	logExecTimes.logStop("RasterizeTriangles::edgeHeight");
-	logExecTimes.logStart("RasterizeTriangles::edgeHeight");
+	//logExecTimes.logStop("RasterizeTriangles::edgeHeight");
+	//logExecTimes.logStart("RasterizeTriangles::edgeHeight");
     int height2 = RasterizeTriangles::edgeHeight(edge2);
-	logExecTimes.logStop("RasterizeTriangles::edgeHeight");
-	logExecTimes.logStart("RasterizeTriangles::edgeHeight");
+	//logExecTimes.logStop("RasterizeTriangles::edgeHeight");
+	//logExecTimes.logStart("RasterizeTriangles::edgeHeight");
     int height3 = RasterizeTriangles::edgeHeight(edge3);
-	logExecTimes.logStop("RasterizeTriangles::edgeHeight");
+	//logExecTimes.logStop("RasterizeTriangles::edgeHeight");
     edge *tall_edge, *short_edge1, *short_edge2;
     int i, row1, row2;
 
@@ -188,5 +188,5 @@ void RasterizeTriangles::rasterizeTriangle(edge *edge1, edge *edge2, edge *edge3
 
     // Go through and fill in the spans
     DrawSpans (row1, row2, label);
-	logExecTimes.logStop("RasterizeTriangles::rasterizeTriangle");
+	//logExecTimes.logStop("RasterizeTriangles::rasterizeTriangle");
 }

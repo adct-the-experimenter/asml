@@ -15,7 +15,7 @@
 
 DelaunayTri::DelaunayTri(const std::vector<cv::Point2i> &XYpoints,
                          const int &width, const int &height, const int &size) {
-	logExecTimes.logStart("DelaunayTri::DelaunayTri");
+	//logExecTimes.logStart("DelaunayTri::DelaunayTri");
 
     this->width = width;
     this->height = height;
@@ -72,7 +72,7 @@ DelaunayTri::DelaunayTri(const std::vector<cv::Point2i> &XYpoints,
     //cv::imwrite("delaunay.png", img);
 
     this->computeNeighbors();
-	logExecTimes.logStop("DelaunayTri::DelaunayTri");
+	//logExecTimes.logStop("DelaunayTri::DelaunayTri");
 
 }
 
@@ -102,7 +102,7 @@ DelaunayTri::~DelaunayTri() {
 
 
 void DelaunayTri::insertMap(const int *ind, const int &secondElem) {
-	logExecTimes.logStart("DelaunayTri::insertMap");
+	//logExecTimes.logStart("DelaunayTri::insertMap");
     int first = *ind, second = *(ind + 1), third = *(ind + 2);
 
     if(mapTriangles.size() == 0) {
@@ -178,12 +178,12 @@ void DelaunayTri::insertMap(const int *ind, const int &secondElem) {
 
 
     }
-	logExecTimes.logStop("DelaunayTri::insertMap");
+	//logExecTimes.logStop("DelaunayTri::insertMap");
 }
 
 
 void DelaunayTri::draw_subdiv() {
-	logExecTimes.logStart("DelaunayTri::draw_subdiv");
+	//logExecTimes.logStart("DelaunayTri::draw_subdiv");
     std::vector<cv::Point> pt(3);
     for( size_t i = 0; i < triangleList.size(); i++ ) {
         cv::Vec6d t = triangleList[i];
@@ -194,20 +194,20 @@ void DelaunayTri::draw_subdiv() {
         cv::line(img, pt[1], pt[2], cv::Scalar(255), 1, 8, 0);
         cv::line(img, pt[2], pt[0], cv::Scalar(255), 1, 8, 0);
     }
-	logExecTimes.logStop("DelaunayTri::draw_subdiv");
+	//logExecTimes.logStop("DelaunayTri::draw_subdiv");
 }
 
 
 cv::Point2d DelaunayTri::GetCircumcenter(const cv::Point2d &a, const cv::Point2d &b, const cv::Point2d &c) {
-	logExecTimes.logStart("DelaunayTri::GetCircumcenter");
+	//logExecTimes.logStart("DelaunayTri::GetCircumcenter");
     PointCGAL p = dt.circumcenter(PointCGAL(a.x, a.y), PointCGAL(b.x, b.y), PointCGAL(c.x, c.y));
-	logExecTimes.logStop("DelaunayTri::GetCircumcenter");
+	//logExecTimes.logStop("DelaunayTri::GetCircumcenter");
     return cv::Point2d(p.x(), p.y());
 }
 
 
 void DelaunayTri::computeNeighbors() {
-	logExecTimes.logStart("DelaunayTri::computeNeighbors");
+	//logExecTimes.logStart("DelaunayTri::computeNeighbors");
     int i, offset = 0;
     for(i = 0; i < size_; ++i) {
         int triangle[3];
@@ -294,5 +294,5 @@ void DelaunayTri::computeNeighbors() {
         }
         offset += 3;
     }
-	logExecTimes.logStop("DelaunayTri::computeNeighbors");
+	//logExecTimes.logStop("DelaunayTri::computeNeighbors");
 }

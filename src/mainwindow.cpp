@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(std::shared_pt
 }
 
 void MainWindow::fprdr(const cv::Mat &resImage, const cv::Mat &gtImage) {
-	logExecTimes.logStart("MainWindow::fprdr");
+	//logExecTimes.logStart("MainWindow::fprdr");
     int false_positives = 0;
     int false_negatives = 0;
     int true_positives = 0;
@@ -111,7 +111,7 @@ void MainWindow::fprdr(const cv::Mat &resImage, const cv::Mat &gtImage) {
             else {
                 std::cout <<"error RESULT = "<<(int)a<<" GT = "<<(int)b<< std::endl;
                 std::cout <<"at i = "<<i<<" j = "<<j<< std::endl;
-				logExecTimes.logStop("MainWindow::fprdr");
+				//logExecTimes.logStop("MainWindow::fprdr");
                 return;
             }
 
@@ -143,11 +143,11 @@ void MainWindow::fprdr(const cv::Mat &resImage, const cv::Mat &gtImage) {
     double acc = (true_positives != 0 || false_negatives != 0 || true_negatives != 0 || false_positives != 0) ? double(true_negatives + true_positives) / double(true_positives + false_negatives + true_negatives + false_positives) : 0;
 
     accuracies.push_back(acc);
-	logExecTimes.logStop("MainWindow::fprdr");
+	//logExecTimes.logStop("MainWindow::fprdr");
 }
 
 int MainWindow::circleCounter(const cv::Mat &img, const int &ncircle) {
-	logExecTimes.logStart("MainWindow::circleCounter");
+	//logExecTimes.logStart("MainWindow::circleCounter");
     cv::Mat tempGray, gray;
 
     cv::Mat sel_1 = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(200, 200));
@@ -177,13 +177,13 @@ int MainWindow::circleCounter(const cv::Mat &img, const int &ncircle) {
     //cv::HoughCircles( gray, circles, CV_HOUGH_GRADIENT, 1, 90, 255, ncircle, 100, 0 ); //20
     cv::HoughCircles( gray, circles, cv::HOUGH_GRADIENT, 1, 90, 255, ncircle, 100, 0 ); //20
 
-	logExecTimes.logStop("MainWindow::circleCounter");
+	//logExecTimes.logStop("MainWindow::circleCounter");
     return circles.size();
 
 }
 
 int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask, const cv::Mat &rgb) {
-	logExecTimes.logStart("MainWindow::imageColorCounting");
+	//logExecTimes.logStart("MainWindow::imageColorCounting");
 
     cv::Mat temp = cv::Mat::zeros(rgb.size(), rgb.type());
     rgb.copyTo(temp, binMask);
@@ -207,12 +207,12 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
         }
     }
 
-	logExecTimes.logStop("MainWindow::imageColorCounting");
+	//logExecTimes.logStop("MainWindow::imageColorCounting");
     return countColor;
 }
 
 void MainWindow::stats(cv::Mat maskImage, float &tr_ratio, float &br_ratio, float &bl_ratio, float &tl_ratio) {
-	logExecTimes.logStart("MainWindow::stats");
+	//logExecTimes.logStart("MainWindow::stats");
     cv::Size extendedSize = maskImage.size();
 
     int offset_w = 1280;
@@ -248,12 +248,12 @@ void MainWindow::stats(cv::Mat maskImage, float &tr_ratio, float &br_ratio, floa
     cv::namedWindow("extended");
     cv::imshow("extended", resizedMask);
     //cv::waitKey(0);
-	logExecTimes.logStop("MainWindow::stats");
+	//logExecTimes.logStop("MainWindow::stats");
 
 }
 
 void MainWindow::findCircle(cv::Mat &src_gray, std::vector<cv::Point2f> &center, std::vector<float> &radius) {
-	logExecTimes.logStart("MainWindow::findCircle");
+	//logExecTimes.logStart("MainWindow::findCircle");
 
     cv::Mat threshold_output;
     std::vector<std::vector<cv::Point> > contours;
@@ -277,13 +277,13 @@ void MainWindow::findCircle(cv::Mat &src_gray, std::vector<cv::Point2f> &center,
         cv::approxPolyDP( cv::Mat(contours[i]), contours_poly[i], 3, true );
         cv::minEnclosingCircle( (cv::Mat)contours_poly[i], center[i], radius[i] );
     }
-	logExecTimes.logStop("MainWindow::findCircle");
+	//logExecTimes.logStop("MainWindow::findCircle");
 
 }
 
 void MainWindow::findTriangles(cv::Mat &src_gray, std::vector<cv::Point2f> center,
                                std::vector<float> radius, cv::Point2f &c, float &r, std::vector<cv::Point2f> &vertices) {
-	logExecTimes.logStart("MainWindow::findTriangles");
+	//logExecTimes.logStart("MainWindow::findTriangles");
     r = -1;
     for( int i = 0; i< center.size(); i++ ) {
         if(radius[i] > r) {
@@ -380,13 +380,13 @@ void MainWindow::findTriangles(cv::Mat &src_gray, std::vector<cv::Point2f> cente
 
     //top left hypotenuse
     cv::line(src_gray, cv::Point(c.x, tl_y), cv::Point(tl_x, c.y), cv::Scalar(80), 3);
-	logExecTimes.logStop("MainWindow::findTriangles");
+	//logExecTimes.logStop("MainWindow::findTriangles");
 
 }
 
 void MainWindow::circularity(cv::Mat &src_gray, cv::Point2f c, float r, std::vector<cv::Point2f> vertices,
                  float &tr_ratio, float &br_ratio, float &bl_ratio, float &tl_ratio) {
-	logExecTimes.logStart("MainWindow::circularity");
+	//logExecTimes.logStart("MainWindow::circularity");
     //top right
     float b = vertices[0].x - c.x;
     float h = c.y - vertices[0].y;
@@ -506,12 +506,12 @@ void MainWindow::circularity(cv::Mat &src_gray, cv::Point2f c, float r, std::vec
     }
 
     tl_ratio = tl_cnt/tl_area;
-	logExecTimes.logStop("MainWindow::circularity");
+	//logExecTimes.logStop("MainWindow::circularity");
 }
 
 void MainWindow::process() {
-	logExecTimes.logStart("MainWindow::process");
-	//cout << "Start Time: " << logExecTimes.GetCurrentTimeForFileName() << endl;
+	//logExecTimes.logStart("MainWindow::process");
+	//cout << "Start Time: " << //logExecTimes.GetCurrentTimeForFileName() << endl;
     //Compute Skin Detection
     SkinDetection skindetector(rgb.clone());
     skindetector.compute();
@@ -760,40 +760,40 @@ void MainWindow::process() {
 
     delete tmpImgFusion;
 	//DLP 20230310 - Print timing logs captured during the run.
-	logExecTimes.logStop("MainWindow::process");
+	//logExecTimes.logStop("MainWindow::process");
 }
 
 
 void MainWindow::compute_segmentation() {
-	logExecTimes.logStart("MainWindow::compute_segmentation");
+	//logExecTimes.logStart("MainWindow::compute_segmentation");
     if(isPossibleToExecute) {
         process();
 		logExecTimes.printLog();
     }
-	logExecTimes.logStop("MainWindow::compute_segmentation");
+	//logExecTimes.logStop("MainWindow::compute_segmentation");
 }
 
 void MainWindow::next() {
-	logExecTimes.logStart("MainWindow::next");
+	//logExecTimes.logStart("MainWindow::next");
     if(isPossibleToExecuteDir) {
         std::cout << index << " " << dirlist.size() << std::endl;
         (index < dirlist.size()) ? index++ : index = index;
         compute_segmentation_manually();
     }
-	logExecTimes.logStop("MainWindow::next");
+	//logExecTimes.logStop("MainWindow::next");
 }
 
 void MainWindow::prev() {
-	logExecTimes.logStart("MainWindow::prev");
+	//logExecTimes.logStart("MainWindow::prev");
     if(isPossibleToExecuteDir) {
         (index == 0) ? index = 0 : index--;
         compute_segmentation_manually();
     }
-	logExecTimes.logStop("MainWindow::prev");
+	//logExecTimes.logStop("MainWindow::prev");
 }
 
 void MainWindow::compute_segmentation_manually() {
-	logExecTimes.logStart("MainWindow::compute_segmentation_manually");
+	//logExecTimes.logStart("MainWindow::compute_segmentation_manually");
     if(isPossibleToExecuteDir) {
         ui->pushButtonNext->setStyleSheet("color: rgb(0, 0, 0); color: rgb(0, 0, 0)");
         ui->pushButtonPrev->setStyleSheet("color: rgb(0, 0, 0); color: rgb(0, 0, 0)");
@@ -845,15 +845,15 @@ void MainWindow::compute_segmentation_manually() {
         delete tmpImg;
 
         process();
-		logExecTimes.printLog();
+		//logExecTimes.printLog();
     }
-	logExecTimes.logStop("MainWindow::compute_segmentation_manually");
+	//logExecTimes.logStop("MainWindow::compute_segmentation_manually");
 }
 
 void MainWindow::compute_segmentation_automaticcaly_images() {}
 
 void MainWindow::compute_segmentation_automaticcaly() {
-	logExecTimes.logStart("MainWindow::compute_segmentation_automaticcaly");
+	//logExecTimes.logStart("MainWindow::compute_segmentation_automaticcaly");
     if(isPossibleToExecuteDir) {
         int end = dirlist.size();
         std::string dir = dirname.toUtf8().constData();
@@ -926,13 +926,13 @@ void MainWindow::compute_segmentation_automaticcaly() {
         fmeas /= fmeasure.size();
 
         std::cout << "F-measure: " << fmeas << std::endl;
-		logExecTimes.printLog();
+		//logExecTimes.printLog();
     }
-	logExecTimes.logStop("MainWindow::compute_segmentation_automaticcaly");
+	//logExecTimes.logStop("MainWindow::compute_segmentation_automaticcaly");
 }
 
 double MainWindow::entropy(const cv::Mat &img) {
-	logExecTimes.logStart("MainWindow::entropy");
+	//logExecTimes.logStart("MainWindow::entropy");
     int numBins = 256, nPixels;
     float range[] = {0, 255};
     double imgEntropy = 0, prob;
@@ -953,7 +953,7 @@ double MainWindow::entropy(const cv::Mat &img) {
 
     }
 
-	logExecTimes.logStop("MainWindow::entropy");
+	//logExecTimes.logStop("MainWindow::entropy");
     return -imgEntropy;
 }
 
@@ -962,57 +962,57 @@ float MainWindow::getHistogramBinValue(const cv::Mat &hist, const int &binNum) {
 }
 
 float MainWindow::getFrequencyOfBin(const cv::Mat &channel) {
-	logExecTimes.logStart("MainWindow::getFrequencyOfBin");
+	//logExecTimes.logStart("MainWindow::getFrequencyOfBin");
     float frequency = 0.0;
     for( int i = 1; i < 255; i++ ) {
-		logExecTimes.logStart("MainWindow::getHistogramBinValue");
+		//logExecTimes.logStart("MainWindow::getHistogramBinValue");
         float Hc = abs(getHistogramBinValue(channel,i));
-		logExecTimes.logStop("MainWindow::getHistogramBinValue");
+		//logExecTimes.logStop("MainWindow::getHistogramBinValue");
         frequency += Hc;
     }
     std::cout << "frequency: " << frequency << std::endl;
-	logExecTimes.logStop("MainWindow::getFrequencyOfBin");
+	//logExecTimes.logStop("MainWindow::getFrequencyOfBin");
     return frequency;
 }
 
 float MainWindow::computeShannonEntropy(const cv::Mat &r, const cv::Mat &g, const cv::Mat &b) {
-	logExecTimes.logStart("MainWindow::computeShannonEntropy");
+	//logExecTimes.logStart("MainWindow::computeShannonEntropy");
     float entropy = 0.0;
     float frequency = getFrequencyOfBin(r);
     for( int i = 1; i < 255; i++ )
     {
-		logExecTimes.logStart("MainWindow::getHistogramBinValue");
+		//logExecTimes.logStart("MainWindow::getHistogramBinValue");
         float Hc = abs(getHistogramBinValue(r,i));
-		logExecTimes.logStop("MainWindow::getHistogramBinValue");
+		//logExecTimes.logStop("MainWindow::getHistogramBinValue");
         entropy += -(Hc/frequency) * log10((Hc/frequency));
     }
     std::cout << "Entropy 1: " << entropy << std::endl;
     frequency = getFrequencyOfBin(g);
     for( int i = 1; i < 255; i++ )
     {
-		logExecTimes.logStart("MainWindow::getHistogramBinValue");
+		//logExecTimes.logStart("MainWindow::getHistogramBinValue");
         float Hc = abs(getHistogramBinValue(g,i));
-		logExecTimes.logStop("MainWindow::getHistogramBinValue");
+		//logExecTimes.logStop("MainWindow::getHistogramBinValue");
         entropy += -(Hc/frequency) * log10((Hc/frequency));
     }
     std::cout << "Entropy 2: " << entropy << std::endl;
     frequency = getFrequencyOfBin(b);
     for( int i = 1; i < 255; i++ )
     {
-		logExecTimes.logStart("MainWindow::getHistogramBinValue");
+		//logExecTimes.logStart("MainWindow::getHistogramBinValue");
         float Hc = abs(getHistogramBinValue(b,i));
-		logExecTimes.logStop("MainWindow::getHistogramBinValue");
+		//logExecTimes.logStop("MainWindow::getHistogramBinValue");
         entropy += -(Hc/frequency) * log10((Hc/frequency));
     }
 
     //cout << entropy <<endl;
     std::cout << "Entropy 3: " << entropy << std::endl;
-	logExecTimes.logStop("MainWindow::computeShannonEntropy");
+	//logExecTimes.logStop("MainWindow::computeShannonEntropy");
     return entropy;
 }
 
 void MainWindow::open_set() {
-	logExecTimes.logStart("MainWindow::open_set");
+	//logExecTimes.logStart("MainWindow::open_set");
     if(isPossibleToExecute) {
         isPossibleToExecute = false;
         ui->computeButton->setStyleSheet("color: rgb(120, 120, 120); color: rgb(120, 120, 120)");
@@ -1068,11 +1068,11 @@ void MainWindow::open_set() {
         isPossibleToExecuteDir = false;
         automatically = false;
     }
-	logExecTimes.logStop("MainWindow::open_set");
+	//logExecTimes.logStop("MainWindow::open_set");
 }
 
 void MainWindow::open_directory() {
-	logExecTimes.logStart("MainWindow::open_directory");
+	//logExecTimes.logStart("MainWindow::open_directory");
     if(isPossibleToExecute) {
         isPossibleToExecute = false;
         ui->computeButton->setStyleSheet("color: rgb(120, 120, 120); color: rgb(120, 120, 120)");
@@ -1124,11 +1124,11 @@ void MainWindow::open_directory() {
         isPossibleToExecuteDir = false;
         automatically = false;
     }
-	logExecTimes.logStop("MainWindow::open_directory");
+	//logExecTimes.logStop("MainWindow::open_directory");
 }
 
 void MainWindow::load_mask() {
-	logExecTimes.logStart("MainWindow::load_mask");
+	//logExecTimes.logStart("MainWindow::load_mask");
 
     std::string dirName = ".";
 
@@ -1157,11 +1157,11 @@ void MainWindow::load_mask() {
 
         loadMask = true;
     }
-	logExecTimes.logStop("MainWindow::load_mask");
+	//logExecTimes.logStop("MainWindow::load_mask");
 }
 
 void MainWindow::open_file() {
-	logExecTimes.logStart("MainWindow::open_file");
+	//logExecTimes.logStart("MainWindow::open_file");
 
     if(isPossibleToExecuteDir) {
         isPossibleToExecuteDir = false;
@@ -1217,5 +1217,5 @@ void MainWindow::open_file() {
     } else {
         isPossibleToExecute = false;
     }
-	logExecTimes.logStop("MainWindow::open_file");
+	//logExecTimes.logStop("MainWindow::open_file");
 }

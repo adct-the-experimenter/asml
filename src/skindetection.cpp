@@ -102,11 +102,10 @@ void SkinDetection::compute() {
 	unsigned char *hostHSVImageData;
 	
 	//Converting Mat to float
-    hostBGRImageData = img_skin.data;
+    hostBGRImageData = img_skin.ptr<unsigned char>();
     
-    //hsv.create(height, width, CV_8U);
-	hsv = cv::Mat::ones(height,width,CV_8U);
-    hostHSVImageData = hsv.data;
+    hsv.create(height, width, CV_8U);
+    hostHSVImageData = hsv.ptr<unsigned char>();
     
     //call kernel that converts bgr to hsv
     bgr_to_hsv_kernel_v1_wrapper(hostBGRImageData, hostHSVImageData, width, height, imageChannels);
