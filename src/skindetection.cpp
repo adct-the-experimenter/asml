@@ -14,6 +14,12 @@
 
 #include "kernels/kernel.cuh"
 
+#include <opencv2/cudaimgproc.hpp> //for opencv cuda version of function
+
+//#define USE_SERIAL
+#define USE_NAIVE
+//#define USE_OPTIMIZED
+
 SkinDetection::SkinDetection(const cv::Mat &img)
 {
     this->img = img;
@@ -85,11 +91,32 @@ void SkinDetection::compute() {
         }
     }
 	
-	//cv::cvtColor(img_skin, hsv, cv::COLOR_BGR2HSV);
+#ifdef USE_SERIAL
+	cv::cvtColor(img_skin, hsv, cv::COLOR_BGR2HSV);
+#endif
 
+#ifdef USE_OPTIMIZED
+	//****************************************
+	//Substitution for bgr to hsv - optimized
+	//****************************************
+	cv::cuda::GpuMat gpu_img_skin; gpu_img_skin.upload(img_skin);
 	
+	int height = img_skin.rows;
+    int width = img_skin.cols;
+
+	hsv.create(height, width, CV_8U);
+	cv::cuda::GpuMat gpu_hsv; gpu_hsv.upload(hsv);
+
+	cv::cuda::cvtColor(gpu_img_skin, gpu_hsv, cv::COLOR_BGR2HSV);
+	gpu_hsv.download(hsv);
+	//****************************************
+	//end substitution for bgr to hsv - optimized
+	//****************************************
+#endif
+
+#ifdef USE_NAIVE
     //********************************
-    //Substitution for bgr to hsv
+    //Substitution for bgr to hsv - naive
     //********************************
 
     //Getting height, width, channels
@@ -115,9 +142,9 @@ void SkinDetection::compute() {
 	temp.copyTo(hsv);
 
 	//********************************
-	// end substitution for bgr to hsv
+	// end substitution for bgr to hsv - naive 
 	//********************************
-
+#endif
 
     for(int i = 0; i < img.rows; i++) {
         for(int j = 0; j< img.cols; j++) {
