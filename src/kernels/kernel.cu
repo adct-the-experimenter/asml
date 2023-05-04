@@ -219,6 +219,28 @@ __global__ void YCrCb2BGR_kernel_optimized(unsigned char* inputImage, unsigned c
 	}
 }
 
+
+
+__global__ void RGB2GRAY(float *outputArray, float *inputArray, int width, int height){
+    //Getting thread indexies
+    int c = threadIdx.x+blockIdx.x*blockDim.x;
+    int r = threadIdx.y+blockIdx.y*blockDim.y;
+
+    //Converting from BGR to GRAYSCALE
+    if (c < width && r < height){
+	    int grayOffset = r*width + c;
+	    int rgbOffset = grayOffset*CHANNELS;
+
+	    float r = inputArray[rgbOffset];
+	    float g = inputArray[rgbOffset+1];
+	    float b = inputArray[rgbOffset+2];
+
+	    outputArray[grayOffset] = 0.21*r + 0.71*g + 0.07*b;
+    }
+}
+
+
+
 	
 void bgr_to_hsv_kernel_v1_wrapper(unsigned char* bgrImage, unsigned char* hsvImage, int width, int height, int imageChannels)
 {
@@ -333,4 +355,56 @@ void YCrCb2BGR_kernel_wrapper(unsigned char* inputImage, unsigned char* outputIm
 	cudaFree(deviceOutputImageData);//free up device memory allocation
 
 	return;
+}
+
+void RGB2GRAY_wrapper(float *hostOutputArray, float *hostInputArray, int width, int height){
+    float *deviceInputArray;
+    float *deviceOutputArray;
+
+    // Allocating memory for device
+    cudaMalloc((void **)&deviceInputArray, width * height * CHANNELS * sizeof(float));
+    cudaMalloc((void **)&deviceOutputArray, width * height * sizeof(float));
+
+    // Copying host to device
+    cudaMemcpy(deviceInputArray, hostInputArray, width * height * CHANNELS * sizeof(float), cudaMemcpyHostToDevice);
+
+    //Calling the kernel
+    dim3 threadBlocks(16,16);
+	dim3 gridDimensions((width-1)/16 + 1, (height-1)/16 + 1);
+
+    RGB2GRAY<<<gridDimensions, threadBlocks>>>(deviceOutputArray, deviceInputArray, width, height);
+
+    // Copying device to host
+    cudaMemcpy(hostOutputArray, deviceOutputArray, width * height * sizeof(float), cudaMemcpyDeviceToHost);
+
+    cudaFree(deviceInputArray);
+    cudaFree(deviceOutputArray);
+
+    return;
+}
+
+void BGR2GRAY_wrapper(float *hostOutputArray, float *hostInputArray, int width, int height){
+    float *deviceInputArray;
+    float *deviceOutputArray;
+
+    // Allocating memory for device
+    cudaMalloc((void **)&deviceInputArray, width * height * CHANNELS * sizeof(float));
+    cudaMalloc((void **)&deviceOutputArray, width * height * sizeof(float));
+
+    // Copying host to device
+    cudaMemcpy(deviceInputArray, hostInputArray, width * height * CHANNELS * sizeof(float), cudaMemcpyHostToDevice);
+
+    //Calling the kernel
+    dim3 threadBlocks(16,16);
+	dim3 gridDimensions((width-1)/16 + 1, (height-1)/16 + 1);
+
+    BGR2GRAY<<<gridDimensions, threadBlocks>>>(deviceOutputArray, deviceInputArray, width, height);
+
+    // Copying device to host
+    cudaMemcpy(hostOutputArray, deviceOutputArray, width * height * sizeof(float), cudaMemcpyDeviceToHost);
+
+    cudaFree(deviceInputArray);
+    cudaFree(deviceOutputArray);
+
+    return;
 }
