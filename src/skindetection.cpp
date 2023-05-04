@@ -17,8 +17,8 @@
 #include <opencv2/cudaimgproc.hpp> //for opencv cuda version of function
 
 //#define USE_SERIAL
-#define USE_NAIVE
-//#define USE_OPTIMIZED
+//#define USE_NAIVE
+#define USE_OPTIMIZED
 
 SkinDetection::SkinDetection(const cv::Mat &img)
 {

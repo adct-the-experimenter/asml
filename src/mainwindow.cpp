@@ -195,16 +195,16 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
     
     //########### Substitution for CUDA enabled kernel ###########
     //cv::cvtColor(temp, gg, CV_BGR2GRAY);
-​
+
     //Getting height & width
     int rows = temp.rows;
-    int cols = temp.cols;
-​
-    //Converting Mat to float
+	int cols = temp.cols;
+
+	//Converting Mat to float
     cv::Mat dst;
     temp.convertTo(dst, CV_32F);
     float *tempData = dst.ptr<float>();
-​
+
 	//Converting 
 	gg.create(rows, cols, CV_8U);
 	gg.convertTo(gg,CV_32F);
@@ -215,14 +215,13 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
     BGR2GRAY_wrapper(output, tempData, cols, rows);
 	//Timing
     logExecTimes.logStop("BGR2GRAY_naive");
-​
-    //Converting output array back into Mat
+
+	//Converting output array back into Mat
     cv::Mat dest(rows, cols, CV_32FC1, output);
     dest.convertTo(gg, CV_8U);
-​
-    //############################################################
-​
-    //############################################################
+
+	//############################################################
+	//############################################################
 
     cv::Vec3b prevColor(0,0,0);
     int countColor = 0;
@@ -602,10 +601,11 @@ void MainWindow::process() {
     cv::Mat grayImg;
 	//DLP 20230310 updated to reflect current constant name
     //cv::cvtColor(rgb_new.clone(), grayImg, CV_BGR2GRAY);
-    //cv::cvtColor(rgb_new.clone(), grayImg, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(rgb_new.clone(), grayImg, cv::COLOR_BGR2GRAY);
     
     //cv::cvtColor(temp, gg, cv::COLOR_BGR2GRAY);
 
+/*
 	//########### Substitution for CUDA enabled kernel ###########
 
     //Timing
@@ -637,7 +637,7 @@ void MainWindow::process() {
     //############################################################
 
     //############################################################
-    
+ */   
     cv::Mat edge;
 
     double thresh = ui->threshSpinBox->value();

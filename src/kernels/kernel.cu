@@ -3,6 +3,8 @@
 
 #include <cmath> //for fmax, fmin functions
 
+#define CHANNELS 3
+
 __global__ void test_kernel() {
 
 	//thread mapping to an index
@@ -219,7 +221,23 @@ __global__ void YCrCb2BGR_kernel_optimized(unsigned char* inputImage, unsigned c
 	}
 }
 
+__global__ void BGR2GRAY(float *outputArray, float *inputArray, int width, int height){
+    //Getting thread indexies
+    int c = threadIdx.x+blockIdx.x*blockDim.x;
+    int r = threadIdx.y+blockIdx.y*blockDim.y;
 
+    //Converting from BGR to GRAYSCALE
+    if (c < width && r < height){
+	    int grayOffset = r*width + c;
+	    int rgbOffset = grayOffset*CHANNELS;
+
+	    float b = inputArray[rgbOffset];
+	    float g = inputArray[rgbOffset+1];
+	    float r = inputArray[rgbOffset+2];
+
+	    outputArray[grayOffset] = 0.21*r + 0.71*g + 0.07*b;
+    }
+}
 
 __global__ void RGB2GRAY(float *outputArray, float *inputArray, int width, int height){
     //Getting thread indexies
