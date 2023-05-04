@@ -58,9 +58,40 @@ void SkinDetection::compute() {
     std::vector<cv::Mat> channels;
     cv::Mat img_hist_equalized;
 	//DLP 20230310 updated to use current constant naming convention
-    //cv::cvtColor(img, img_hist_equalized, CV_BGR2YCrCb); //change the color image from BGR to YCrCb format
-    cv::cvtColor(img, img_hist_equalized, cv::COLOR_BGR2YCrCb); //change the color image from BGR to YCrCb format
+    
+    //cv::cvtColor(img, img_hist_equalized, cv::COLOR_BGR2YCrCb); //change the color image from BGR to YCrCb format
+	
+	//Get BGR image height, width, channels
+    int heightBGR = img.rows;
+    int widthBGR = img.cols;
+    int imageChannelsBGR = img.channels();
+    //declare working mats
+    cv::Mat inBGR, inYCrCb, outYCrCb, outBGR;
+    //creat host array pointers
+    unsigned char *inImageDataBGR, *inImageDataYCrCb, *outImageDataBGR, *outImageDataYCrCb;
 
+    //cout << "img - channels: " << imageChannelsBGR << "width: " << widthBGR <<  "height: " << heightBGR << endl;
+	
+    //Convert input mat to unsigned chars and set pointer to it
+    img.copyTo(inBGR);
+    inImageDataBGR = inBGR.ptr<unsigned char>();
+    
+    //Convert output mat to unsigned chars and set pointer to it
+    outYCrCb.create(heightBGR, widthBGR, CV_8UC3);
+    outImageDataYCrCb = outYCrCb.ptr<unsigned char>();
+    
+    //call kernel that converts bgr to ycrcb
+    BGR2YCrCb_kernel_wrapper(inImageDataBGR, outImageDataYCrCb, widthBGR, heightBGR, imageChannelsBGR);
+    
+    //Converting output array back into Mat
+    cv::Mat outYCrCb_temp(heightBGR, widthBGR, CV_8UC3, outImageDataYCrCb);
+    outYCrCb_temp.copyTo(img_hist_equalized);
+    //cout << "img_hist_equalized - channels: " << img_hist_equalized.channels()  << "width: " << img_hist_equalized.cols <<  "height: " << img_hist_equalized.rows << endl;
+ 
+    //********************************
+    // end substitution for BGR to YCrCb
+    //********************************
+	
     cv::split(img_hist_equalized,channels); //split the image into channels
 
     cv::equalizeHist(channels[0], channels[0]); //equalize histogram on the 1st channel (Y)
@@ -69,7 +100,37 @@ void SkinDetection::compute() {
 
 	//DLP 20230310 updated to use current constant naming convention
     //cv::cvtColor(img_hist_equalized, img_hist_equalized, CV_YCrCb2BGR);
-    cv::cvtColor(img_hist_equalized, img_hist_equalized, cv::COLOR_YCrCb2BGR);
+    
+    //cv::cvtColor(img_hist_equalized, img_hist_equalized, cv::COLOR_YCrCb2BGR);
+    
+    //********************************
+    //Substitution for YCrCb to BGR
+    //********************************
+
+    //Get YCrCb image height, width, channels
+    int heightYCrCb = img_hist_equalized.rows;
+    int widthYCrCb = img_hist_equalized.cols;
+    int imageChannelsYCrCb = img_hist_equalized.channels();
+	
+    //Convert input mat to unsigned chars and set pointer to it
+    img_hist_equalized.copyTo(inYCrCb);
+    inImageDataYCrCb = inYCrCb.ptr<unsigned char>();
+    
+    //Convert output mat to unsigned chars and set pointer to it
+    outBGR.create(heightYCrCb, widthYCrCb, CV_8UC3);
+    outImageDataBGR = outBGR.ptr<unsigned char>();
+    
+    //call kernel that converts ycrcb to bgr
+    YCrCb2BGR_kernel_wrapper(inImageDataYCrCb, outImageDataBGR, widthYCrCb, heightYCrCb, imageChannelsYCrCb);
+    
+    //Converting output array back into Mat
+    cv::Mat outBGR_temp(heightYCrCb, widthYCrCb, CV_8UC3, outImageDataBGR);
+    outBGR_temp.copyTo(img_hist_equalized);
+    //cout << "img_hist_equalized,3 - channels: " << img_hist_equalized.channels()  << "width: " << img_hist_equalized.cols <<  "height: " << img_hist_equalized.rows << endl;
+
+    //********************************
+    // end substitution for YCrCb to BGR
+    //********************************
 
     img = img_hist_equalized.clone();
 

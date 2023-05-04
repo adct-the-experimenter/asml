@@ -6,5 +6,7 @@
 void test_kernel_wrapper();
 
 void bgr_to_hsv_kernel_v1_wrapper(unsigned char* bgrImage, unsigned char* hsvImage, int width, int height, int imageChannels);
+void BGR2YCrCb_kernel_wrapper(unsigned char* bgrImage, unsigned char* YCrCbImage, int width, int height, int imageChannels);
+void YCrCb2BGR_kernel_wrapper(unsigned char* bgrImage, unsigned char* YCrCbImage, int width, int height, int imageChannels);
 
 #endif
