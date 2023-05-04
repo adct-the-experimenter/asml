@@ -24,6 +24,8 @@ int countImages = 0;
 // global vector for capturing execution times
 ExecTimeLogger logExecTimes;
 
+#include "implementation_version.h"
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(std::shared_ptr<Ui::MainWindow>(new Ui::MainWindow)) {
     ui->setupUi(this);
     ui->edge_detection_label->setStyleSheet("background-color: black");
@@ -191,10 +193,13 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
     cv::Mat gg;
 	//DLP 20230310 updated to reflect current constant name
     //cv::cvtColor(temp, gg, CV_BGR2GRAY);
-    //cv::cvtColor(temp, gg, cv::COLOR_BGR2GRAY);
     
+#ifdef USE_SERIAL
+	cv::cvtColor(temp, gg, cv::COLOR_BGR2GRAY);
+#endif
+    
+#if defined(USE_NAIVE) || defined(USE_OPTIMIZED)
     //########### Substitution for CUDA enabled kernel ###########
-    //cv::cvtColor(temp, gg, CV_BGR2GRAY);
 
     //Getting height & width
     int rows = temp.rows;
@@ -222,6 +227,7 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
 
 	//############################################################
 	//############################################################
+#endif
 
     cv::Vec3b prevColor(0,0,0);
     int countColor = 0;

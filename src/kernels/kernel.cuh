@@ -2,6 +2,7 @@
 #define KERNELS_CUH__
 
 #include <stdio.h>
+#include "../implementation_version.h"
 
 void test_kernel_wrapper();
 

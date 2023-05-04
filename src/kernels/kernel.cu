@@ -362,8 +362,12 @@ void YCrCb2BGR_kernel_wrapper(unsigned char* inputImage, unsigned char* outputIm
 	cudaMemcpy(deviceInputImageData, inputImage, imgBytes, cudaMemcpyHostToDevice); //copy image array to device
 
 	//execute the colorspace conversion
-//	YCrCb2BGR_kernel_naive<<<gridDim, blockDim>>>(deviceInputImageData, deviceOutputImageData, width, height, imageChannels);
+#ifdef USE_NAIVE
+	YCrCb2BGR_kernel_naive<<<gridDim, blockDim>>>(deviceInputImageData, deviceOutputImageData, width, height, imageChannels);
+#endif
+#ifdef USE_OPTIMIZED
 	YCrCb2BGR_kernel_optimized<<<gridDim, blockDim>>>(deviceInputImageData, deviceOutputImageData, width, height, imageChannels);
+#endif
 
 	cudaDeviceSynchronize();//wait for all threads to complete
 

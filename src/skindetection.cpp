@@ -16,9 +16,7 @@
 
 #include <opencv2/cudaimgproc.hpp> //for opencv cuda version of function
 
-//#define USE_SERIAL
-//#define USE_NAIVE
-#define USE_OPTIMIZED
+#include "implementation_version.h"
 
 SkinDetection::SkinDetection(const cv::Mat &img)
 {
@@ -58,9 +56,12 @@ void SkinDetection::compute() {
     std::vector<cv::Mat> channels;
     cv::Mat img_hist_equalized;
 	//DLP 20230310 updated to use current constant naming convention
-    
-    //cv::cvtColor(img, img_hist_equalized, cv::COLOR_BGR2YCrCb); //change the color image from BGR to YCrCb format
-	
+
+#ifdef USE_SERIAL    
+    cv::cvtColor(img, img_hist_equalized, cv::COLOR_BGR2YCrCb); //change the color image from BGR to YCrCb format
+#endif
+
+#if defined(USE_NAIVE) || defined(USE_OPTIMIZED)
 	//Get BGR image height, width, channels
     int heightBGR = img.rows;
     int widthBGR = img.cols;
@@ -91,6 +92,7 @@ void SkinDetection::compute() {
     //********************************
     // end substitution for BGR to YCrCb
     //********************************
+#endif
 	
     cv::split(img_hist_equalized,channels); //split the image into channels
 
@@ -100,9 +102,12 @@ void SkinDetection::compute() {
 
 	//DLP 20230310 updated to use current constant naming convention
     //cv::cvtColor(img_hist_equalized, img_hist_equalized, CV_YCrCb2BGR);
-    
-    //cv::cvtColor(img_hist_equalized, img_hist_equalized, cv::COLOR_YCrCb2BGR);
-    
+
+#ifdef USE_SERIAL
+    cv::cvtColor(img_hist_equalized, img_hist_equalized, cv::COLOR_YCrCb2BGR);
+#endif
+
+#if defined(USE_NAIVE) || defined(USE_OPTIMIZED)
     //********************************
     //Substitution for YCrCb to BGR
     //********************************
@@ -131,6 +136,7 @@ void SkinDetection::compute() {
     //********************************
     // end substitution for YCrCb to BGR
     //********************************
+#endif
 
     img = img_hist_equalized.clone();
 
