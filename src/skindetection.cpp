@@ -49,7 +49,7 @@ void SkinDetection::setParameters(const int &Y, const int &Cr, const int &Cb, co
 }
 
 void SkinDetection::compute() {
-	logExecTimes.logStart("SkinDetection::compute cuda");
+	logExecTimes.logStart("SkinDetection::compute");
 
     cv::Mat img_skin = img.clone();
 
@@ -57,6 +57,7 @@ void SkinDetection::compute() {
     cv::Mat img_hist_equalized;
 	//DLP 20230310 updated to use current constant naming convention
 
+	logExecTimes.logStart("BGR to YCrCb");
 #ifdef USE_SERIAL    
     cv::cvtColor(img, img_hist_equalized, cv::COLOR_BGR2YCrCb); //change the color image from BGR to YCrCb format
 #endif
@@ -93,7 +94,8 @@ void SkinDetection::compute() {
     // end substitution for BGR to YCrCb
     //********************************
 #endif
-	
+	logExecTimes.logStop("BGR to YCrCb");
+
     cv::split(img_hist_equalized,channels); //split the image into channels
 
     cv::equalizeHist(channels[0], channels[0]); //equalize histogram on the 1st channel (Y)
@@ -103,6 +105,7 @@ void SkinDetection::compute() {
 	//DLP 20230310 updated to use current constant naming convention
     //cv::cvtColor(img_hist_equalized, img_hist_equalized, CV_YCrCb2BGR);
 
+	logExecTimes.logStart("YCrCb to BGR");
 #ifdef USE_SERIAL
     cv::cvtColor(img_hist_equalized, img_hist_equalized, cv::COLOR_YCrCb2BGR);
 #endif
@@ -137,6 +140,7 @@ void SkinDetection::compute() {
     // end substitution for YCrCb to BGR
     //********************************
 #endif
+	logExecTimes.logStop("YCrCb to BGR");
 
     img = img_hist_equalized.clone();
 
@@ -158,6 +162,7 @@ void SkinDetection::compute() {
         }
     }
 	
+	logExecTimes.logStart("BGR to HSV");
 #ifdef USE_SERIAL
 	cv::cvtColor(img_skin, hsv, cv::COLOR_BGR2HSV);
 #endif
@@ -212,6 +217,7 @@ void SkinDetection::compute() {
 	// end substitution for bgr to hsv - naive 
 	//********************************
 #endif
+	logExecTimes.logStop("BGR to HSV");
 
     for(int i = 0; i < img.rows; i++) {
         for(int j = 0; j< img.cols; j++) {

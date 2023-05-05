@@ -194,6 +194,8 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
 	//DLP 20230310 updated to reflect current constant name
     //cv::cvtColor(temp, gg, CV_BGR2GRAY);
     
+	logExecTimes.logStart("BGR to Gray");
+
 #ifdef USE_SERIAL
 	cv::cvtColor(temp, gg, cv::COLOR_BGR2GRAY);
 #endif
@@ -228,6 +230,7 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
 	//############################################################
 	//############################################################
 #endif
+	logExecTimes.logStop("BGR to Gray");
 
     cv::Vec3b prevColor(0,0,0);
     int countColor = 0;
