@@ -185,7 +185,7 @@ int MainWindow::circleCounter(const cv::Mat &img, const int &ncircle) {
 }
 
 int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask, const cv::Mat &rgb) {
-	//logExecTimes.logStart("MainWindow::imageColorCounting");
+	logExecTimes.logStart("MainWindow::imageColorCounting");
 
     cv::Mat temp = cv::Mat::zeros(rgb.size(), rgb.type());
     rgb.copyTo(temp, binMask);
@@ -243,7 +243,7 @@ int MainWindow::imageColorCounting(const cv::Rect &rect, const cv::Mat &binMask,
         }
     }
 
-	//logExecTimes.logStop("MainWindow::imageColorCounting");
+	logExecTimes.logStop("MainWindow::imageColorCounting");
     return countColor;
 }
 
@@ -546,7 +546,7 @@ void MainWindow::circularity(cv::Mat &src_gray, cv::Point2f c, float r, std::vec
 }
 
 void MainWindow::process() {
-	//logExecTimes.logStart("MainWindow::process");
+	logExecTimes.logStart("MainWindow::process");
 	//cout << "Start Time: " << //logExecTimes.GetCurrentTimeForFileName() << endl;
     //Compute Skin Detection
     SkinDetection skindetector(rgb.clone());
@@ -832,7 +832,7 @@ void MainWindow::process() {
 
     delete tmpImgFusion;
 	//DLP 20230310 - Print timing logs captured during the run.
-	//logExecTimes.logStop("MainWindow::process");
+	logExecTimes.logStop("MainWindow::process");
 }
 
 
